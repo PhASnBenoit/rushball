@@ -11,22 +11,23 @@
 #define MAX_PANS 8
 #define NB_CIBLES_PAN 3
 #define MAX_JOUEURS 4
+#define MAX_NB_COULEURS 8  // 7 couleurs max ETEINT n'est pas une couleur mais compte comme une valeur.
 // params panneaux
 #define ADR_BASE_PAN 0x31   // adresse de base du premier panneau
 // PORT SERVEUR
-#define PORT 4444
+#define PORT 4444  // A METTRE DANS CONFIG.INI
 
-//
-// définitions ZDC
-//
-#define KEY "RUSHBALL2020"
-typedef struct datas {
-    bool cibles[MAX_PANS][NB_CIBLES_PAN];
-    uint8_t couleurs[MAX_PANS][NB_CIBLES_PAN];
-    uint8_t nbPanneaux;
-    QString pseudos[MAX_JOUEURS];
-    uint16_t scores[MAX_JOUEURS];
-} T_DATAS;
+typedef enum couleurs {
+    ETEINT,
+    COULEUR1,
+    COULEUR2,
+    COULEUR3,
+    COULEUR4,
+    COULEUR5,
+    COULEUR6,
+    COULEUR_JOKER
+} T_COULEURS;
+
 
 
 #endif // COMMUNS_H

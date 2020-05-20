@@ -14,6 +14,8 @@ private:
     CCommClient *_client;
     bool _erreur;  // true=client non défini
 
+
+
 signals:
 
 public slots:
