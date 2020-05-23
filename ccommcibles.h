@@ -19,7 +19,7 @@ private:
     bool _pause;
 
 signals:
-    void sig_resultReady(QByteArray cible);
+    void sig_ciblesTouchees(QByteArray cible);
     void sig_replay();
 
 public slots:

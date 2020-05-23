@@ -47,10 +47,10 @@ class CZdc : public QSharedMemory
 public:
     CZdc();
     ~CZdc();
-    void getCouleurs(T_COULEURS *tabCouleurs);
-    void getCibles(bool *tabCibles);
-    void setCouleurs(T_COULEURS *tabCouleurs);
-    void setCibles(bool *tabCibles);
+    T_COULEURS *getCouleurs();
+    bool* getCibles();
+    void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
+    void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
 
 private:
     T_ZDC *_zdc;

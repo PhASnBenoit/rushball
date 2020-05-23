@@ -34,7 +34,7 @@ signals:
     void sig_play();
 
 public slots:
-    void on_resultReady(QByteArray cibles);
+    void on_ciblesTouchees(QByteArray cibles);
 };
 
 #endif // CJEU_H

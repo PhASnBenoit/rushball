@@ -48,12 +48,12 @@ void CJeu::play()
     _pans->moveToThread(_thPans);
     connect(_thPans, &QThread::finished, _pans, &QObject::deleteLater);
     connect(this, &CJeu::sig_play, _pans, &CCommCibles::on_play);
-    connect(_pans, &CCommCibles::sig_resultReady, this, &CJeu::on_resultReady);
+    connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
     emit sig_play();  // lance la communication I2C
 } // méthode
 
-void CJeu::on_resultReady(QByteArray cibles)
+void CJeu::on_ciblesTouchees(QByteArray cibles)
 {
     // appelé à la fin d'un cycle de communication I2C avec les panneaux
 

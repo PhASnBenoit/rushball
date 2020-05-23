@@ -15,26 +15,34 @@ CZdc::~CZdc()
     detach();
 }
 
-void CZdc::getCouleurs(T_COULEURS *tabCouleurs)
+T_COULEURS* CZdc::getCouleurs()
 {
+    T_COULEURS *couleurs;
     lock();
+    couleurs = &_zdc->datasDyn.couleurs[0][0];
     unlock();
+    return couleurs;
 }
 
-void CZdc::getCibles(bool *tabCibles)
+bool* CZdc::getCibles()
 {
+    bool *cibles;
     lock();
+    cibles = &_zdc->datasDyn.cibles[0][0];
     unlock();
+    return cibles;
 }
 
 void CZdc::setCouleurs(T_COULEURS *tabCouleurs)
 {
     lock();
+    memcpy(_zdc->datasDyn.couleurs, tabCouleurs, MAX_PANS*NB_CIBLES_PAN);
     unlock();
 }
 
 void CZdc::setCibles(bool *tabCibles)
 {
     lock();
+    memcpy(_zdc->datasDyn.cibles, tabCibles, MAX_PANS*NB_CIBLES_PAN);
     unlock();
 }
