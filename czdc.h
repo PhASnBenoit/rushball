@@ -26,7 +26,7 @@ typedef struct datasStatic {
     uint16_t cpt;  // score ou temps à atteindre
     uint8_t nbPointsFaute; // nombre de points en moins pour une faute
     uint8_t nbPanneaux;  // Nombre de panneaux connectés
-    uint8_t nbreCiblesOn;  // Nombre de cibles allumées au départ
+    uint8_t nbCiblesOn;  // Nombre de cibles allumées au départ
     bool joker;  // Joker prévu ou non
     uint16_t nbPointsJoker; // nombre de points si joker atteint
     uint8_t nbCouleurs;  // sans couleur joker

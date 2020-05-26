@@ -86,15 +86,43 @@ void CJeu::on_trameConnexion(QByteArray tc)
 
 void CJeu::on_trameParametrage(QByteArray tc)
 {
-    // décoder la trame de paramétrage et la sauver dans la zdc
-    _zdc->_adrZdc->datasStatic.nbreJoueurs = static_cast<uint8_t>(tc.at(3)-0x30);
+    // réception de la trame de paramétrage et traitement
 
+    // décoder la trame de paramétrage et la sauver dans la zdc
+    _zdc->_adrZdc->datasStatic.nbreJoueurs = static_cast<uint8_t>(tc.at(3)-0x30);  // nombre de joueurs
+    // contrôler nombre de joueurs
+    QList<QByteArray> groupes;
+    groupes = tc.split('|');
     QList<QByteArray> params;
-    params = tc.split('|');
-    QList<QByteArray> joueurs;
-    joueurs = params.at(1).split(';');
-    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbreJoueurs ; i++)
-        _zdc->_adrZdc->datasStatic.nomJoueurs[i] = joueurs.at(i);
+
+    params = groupes.at(1).split(';');
+    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbreJoueurs ; i++)   // noms des joueurs
+        _zdc->_adrZdc->datasStatic.nomJoueurs[i] = params.at(i);
+
+    params.clear();
+    params = groupes.at(2).split(';');
+    _zdc->_adrZdc->datasStatic.modeJeu = params.at(0)[0]-0x30;  // mode de jeu
+    _zdc->_adrZdc->datasStatic.modeFinJeu = params.at(1)[0]-0x30;  // mode fin de jeu
+    _zdc->_adrZdc->datasStatic.cpt = static_cast<uint16_t>(params.at(2).toUInt());  // score ou temps de départ
+
+    _zdc->_adrZdc->datasStatic.nbPointsFaute = static_cast<uint8_t>(groupes.at(3).toUInt());  // nb points pour faute
+
+    params.clear();
+    params = groupes.at(4).split(';');
+    _zdc->_adrZdc->datasStatic.nbPanneaux = static_cast<uint8_t>(params.at(0)[0]-0x30);  // nb de panneau
+    _zdc->_adrZdc->datasStatic.nbCiblesOn = static_cast<uint8_t>(params.at(1).toUInt());  // nb cibles allumées
+
+    params.clear();
+    params = groupes.at(5).split(';');
+    _zdc->_adrZdc->datasStatic.joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
+    _zdc->_adrZdc->datasStatic.nbPointsJoker = static_cast<uint8_t>(params.at(1).toUInt());  // nb points joker
+
+    _zdc->_adrZdc->datasStatic.nbCouleurs = static_cast<uint8_t>(groupes.at(6).toUInt());  // nombre de couleurs utilisées
+
+    params.clear();
+    params = groupes.at(7).split(';');
+    _zdc->_adrZdc->datasStatic.joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
+
 
 
 
