@@ -35,6 +35,10 @@ signals:
 
 public slots:
     void on_ciblesTouchees(QByteArray cibles);
+    void on_emettreVersClient(QByteArray tc);
+    void on_trameConnexion(QByteArray tc);
+    void on_trameParametrage(QByteArray tc);
+    void on_trameAnnulationPartie(QByteArray tc);
 };
 
 #endif // CJEU_H

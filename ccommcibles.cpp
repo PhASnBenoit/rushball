@@ -2,6 +2,7 @@
 
 CCommCibles::CCommCibles(QObject *parent) : QObject(parent)
 {
+
     _i2c = CI2c::getInstance(this, '1');
     _pause = false;
     connect(this, &CCommCibles::sig_replay, this, &CCommCibles::on_play);
@@ -24,8 +25,8 @@ void CCommCibles::on_play()
 
     // MISE A JOUR DES COULEURS
     for (int i=0 ; i<nbPanneaux ; i++) {
-        couleurs[0] = static_cast<uint8_t>(COULEUR1);
-        couleurs[1] = COULEUR2;
+        couleurs[0] = static_cast<uint8_t>(ROUGE);
+        couleurs[1] = VERT;
         couleurs[2] = ETEINT; // Simulation
         _i2c->ecrire(static_cast<uint8_t>(ADR_BASE_PAN+i), couleurs, 3);
     } //for
@@ -35,10 +36,8 @@ void CCommCibles::on_play()
         _i2c->lire(static_cast<uint8_t>(ADR_BASE_PAN+i), &panneau, 1);
         cibles.append(static_cast<char>(panneau));
         // SAUVER DANS ZDC ETAT CIBLES
+
     } //for
-
-    // LIRE COULEUR CIBLE A AFFICHER dans ZDC
-
 
     emit sig_ciblesTouchees(cibles);
     if (!_pause)  // on relance sauf si pause demandée

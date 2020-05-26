@@ -8,6 +8,7 @@ class CBdd : public QObject
     Q_OBJECT
 public:
     explicit CBdd(QObject *parent = nullptr);
+    bool verifierParamsConnexion(QString login, QString mdp);
 
 signals:
 

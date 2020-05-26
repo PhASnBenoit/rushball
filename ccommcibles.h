@@ -4,7 +4,6 @@
 #include <QObject>
 
 #include "czdc.h"
-
 #include "../biblis/ci2c.h"
 
 class CCommCibles : public QObject
@@ -17,6 +16,7 @@ public:
 private:
     CI2c *_i2c;
     bool _pause;
+    CZdc *_zdc;
 
 signals:
     void sig_ciblesTouchees(QByteArray cible);

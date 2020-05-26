@@ -19,12 +19,12 @@
 
 typedef enum couleurs {
     ETEINT,
-    COULEUR1,
-    COULEUR2,
-    COULEUR3,
-    COULEUR4,
-    COULEUR5,
-    COULEUR6,
+    ROUGE,
+    VERT,
+    BLEU,
+    VIOLET,
+    CYAN,
+    BLANC,
     COULEUR_JOKER
 } T_COULEURS;
 
