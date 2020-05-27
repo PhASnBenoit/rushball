@@ -55,6 +55,7 @@ public:
     bool* getCiblesByPanneau(uint8_t noPan);
     void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
     void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
+    void clear();
 
 /*
       QString nomJoueurs[MAX_JOUEURS];

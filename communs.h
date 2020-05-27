@@ -28,6 +28,4 @@ typedef enum couleurs {
     COULEUR_JOKER
 } T_COULEURS;
 
-
-
 #endif // COMMUNS_H

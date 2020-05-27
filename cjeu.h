@@ -12,6 +12,9 @@
 #include "ccommclient.h"
 #include "cprotocoleclient.h"
 
+#define ETAT_ATTENTE_CONNEXION 0
+#define ETAT_JEU_EN_COURS 1
+
 class CJeu : public QObject
 {
     Q_OBJECT
@@ -29,9 +32,10 @@ private:
     CCommAffichage *_aff;
     CProtocoleClient *_prot;
     QThread *_thPans, *_thPup, *_thAff;
+    uint8_t _etat;  // état du jeu 0=en attente connexion 1=1 client connecté 2=jeu en cours 3=jeu en cours avec plusieurs clients connectés
 
 signals:
-    void sig_play();
+    void sig_playCommCibles();
 
 public slots:
     void on_ciblesTouchees(QByteArray cibles);

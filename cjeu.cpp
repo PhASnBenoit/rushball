@@ -3,6 +3,7 @@
 CJeu::CJeu(QObject *parent) : QObject(parent)
 {
     _zdc = new CZdc();  // accès à la mémoire partagée commune
+    _etat = ETAT_ATTENTE_CONNEXION;  // en attente de connexion d'un client
 
     // pour le moment, qu'un seul client autorisé à se connecter.
     // EVOLUTION 2021 : Plusieurs clients se connectent
@@ -48,20 +49,22 @@ CJeu::~CJeu()
 
 void CJeu::play()
 {
-    // initialiser l'écran à faire
+    // initialiser l'affichage des joueurs à faire
+    //    _aff = new CCommAffichage();
 
+    // init de la comm avec le pupitre
+    //    _pup = new CCommPupitre();
 
+    // init thread de communication avec les cibles
     _pans = new CCommCibles();
-//    _pup = new CCommPupitre();
-//    _aff = new CCommAffichage();
-
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
     connect(_thPans, &QThread::finished, _pans, &QObject::deleteLater);
-    connect(this, &CJeu::sig_play, _pans, &CCommCibles::on_play);
+    connect(this, &CJeu::sig_playCommCibles, _pans, &CCommCibles::on_play);
     connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
-    emit sig_play();  // lance la communication I2C
+    emit sig_playCommCibles();  // lance la communication I2C
+    _etat = ETAT_JEU_EN_COURS;
 } // méthode
 
 void CJeu::on_ciblesTouchees(QByteArray cibles)
@@ -88,6 +91,7 @@ void CJeu::on_trameParametrage(QByteArray tc)
 {
     // réception de la trame de paramétrage et traitement
 
+    _zdc->clear();  // RAZ aux valeurs par défaut
     // décoder la trame de paramétrage et la sauver dans la zdc
     _zdc->_adrZdc->datasStatic.nbreJoueurs = static_cast<uint8_t>(tc.at(3)-0x30);  // nombre de joueurs
     // contrôler nombre de joueurs
@@ -121,10 +125,8 @@ void CJeu::on_trameParametrage(QByteArray tc)
 
     params.clear();
     params = groupes.at(7).split(';');
-    _zdc->_adrZdc->datasStatic.joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
-
-
-
+    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
+        _zdc->_adrZdc->datasStatic.nbPointscouleurs[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
 
     play(); // lancement du jeu
 }

@@ -9,6 +9,7 @@ CZdc::CZdc()
             qDebug() << "CZdc::CZdc Erreur de création de la SHM";
         } // if erreur
     _adrZdc = static_cast<T_ZDC *>(data());
+    clear();  // toutes les infos à 0
 }
 
 CZdc::~CZdc()
@@ -55,4 +56,10 @@ void CZdc::setCibles(bool *tabCibles)
     lock();
     memcpy(_adrZdc->datasDyn.toucheCibles, tabCibles, MAX_PANS*NB_CIBLES_PAN);
     unlock();
+}
+
+void CZdc::clear()
+{
+    // RAZ de toutes les informations
+    bzero(_adrZdc, sizeof(T_ZDC));
 }
