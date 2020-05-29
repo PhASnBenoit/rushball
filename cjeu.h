@@ -36,13 +36,15 @@ private:
 
 signals:
     void sig_playCommCibles();
+    void sig_erreur(QString mess);
 
 public slots:
     void on_ciblesTouchees(QByteArray cibles);
     void on_emettreVersClient(QByteArray tc);
-    void on_trameConnexion(QByteArray tc);
+    void on_trameConnexion(QString login, QString mdp, QString origine);
     void on_trameParametrage(QByteArray tc);
     void on_trameAnnulationPartie(QByteArray tc);
+    void on_erreurParams(QByteArray tc);
 };
 
 #endif // CJEU_H

@@ -12,6 +12,12 @@ CCommClient::~CCommClient()
     delete _client;
 }
 
+int CCommClient::repondreAuClient(QByteArray rep)
+{
+    _client->write(rep);
+    return 0; // RAS
+}
+
 void CCommClient::on_newConnection()
 {
     _client = nextPendingConnection(); // récupération de la socket client

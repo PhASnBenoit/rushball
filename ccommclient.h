@@ -14,6 +14,7 @@ class CCommClient : public QTcpServer
 public:
     CCommClient();
     ~CCommClient();
+    int repondreAuClient(QByteArray rep);
 
 private:
     QTcpSocket *_client;

@@ -16,6 +16,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_prot, &CProtocoleClient::sig_trameConnexion, this, &CJeu::on_trameConnexion);
     connect(_prot, &CProtocoleClient::sig_trameParametrage, this, &CJeu::on_trameParametrage);
     connect(_prot, &CProtocoleClient::sig_trameAnnulationPartie, this, &CJeu::on_trameAnnulationPartie);
+    connect(_prot, &CProtocoleClient::sig_erreurParams, this, &CJeu::on_erreurParams);
 
 } // méthode
 
@@ -49,6 +50,8 @@ CJeu::~CJeu()
 
 void CJeu::play()
 {
+    // appelé lorsque le paramétrage est correct.
+    
     // initialiser l'affichage des joueurs à faire
     //    _aff = new CCommAffichage();
 
@@ -56,6 +59,7 @@ void CJeu::play()
     //    _pup = new CCommPupitre();
 
     // init thread de communication avec les cibles
+    _etat = ETAT_JEU_EN_COURS;
     _pans = new CCommCibles();
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
@@ -64,7 +68,6 @@ void CJeu::play()
     connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
-    _etat = ETAT_JEU_EN_COURS;
 } // méthode
 
 void CJeu::on_ciblesTouchees(QByteArray cibles)
@@ -79,59 +82,44 @@ void CJeu::on_emettreVersClient(QByteArray tc)
     // préparer la réponse et l'envoyer au client
 }
 
-void CJeu::on_trameConnexion(QByteArray tc)
+void CJeu::on_trameConnexion(QString login, QString mdp, QString origine)
 {
-    // vérifie si première connexion pour autorisation paramétrage
+    QByteArray rep;
+
     // vérification du login + mdp
+    if (!_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp
+        // vérifier si premier connecté mode P ou mode S
+    } else {
+        rep = _prot->repondreAConnexion('0');
+        _serv->repondreAuClient(rep);
+        emit sig_erreur("Erreur d'identifiant de connexion."+login +" "+mdp);
+        return;
+    } // else
+
+    // A FAIRE - mémoriser le type de client origine
+
     // réponse au client
+    if (_etat == ETAT_ATTENTE_CONNEXION)
+        rep = _prot->repondreAConnexion('P'); // mode paramétrage
+    else
+        rep = _prot->repondreAConnexion('S'); // mode suivi
+
     // gérer mode suivi ou Paramétrage
 }
 
 void CJeu::on_trameParametrage(QByteArray tc)
 {
-    // réception de la trame de paramétrage et traitement
-
-    _zdc->clear();  // RAZ aux valeurs par défaut
-    // décoder la trame de paramétrage et la sauver dans la zdc
-    _zdc->_adrZdc->datasStatic.nbreJoueurs = static_cast<uint8_t>(tc.at(3)-0x30);  // nombre de joueurs
-    // contrôler nombre de joueurs
-    QList<QByteArray> groupes;
-    groupes = tc.split('|');
-    QList<QByteArray> params;
-
-    params = groupes.at(1).split(';');
-    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbreJoueurs ; i++)   // noms des joueurs
-        _zdc->_adrZdc->datasStatic.nomJoueurs[i] = params.at(i);
-
-    params.clear();
-    params = groupes.at(2).split(';');
-    _zdc->_adrZdc->datasStatic.modeJeu = params.at(0)[0]-0x30;  // mode de jeu
-    _zdc->_adrZdc->datasStatic.modeFinJeu = params.at(1)[0]-0x30;  // mode fin de jeu
-    _zdc->_adrZdc->datasStatic.cpt = static_cast<uint16_t>(params.at(2).toUInt());  // score ou temps de départ
-
-    _zdc->_adrZdc->datasStatic.nbPointsFaute = static_cast<uint8_t>(groupes.at(3).toUInt());  // nb points pour faute
-
-    params.clear();
-    params = groupes.at(4).split(';');
-    _zdc->_adrZdc->datasStatic.nbPanneaux = static_cast<uint8_t>(params.at(0)[0]-0x30);  // nb de panneau
-    _zdc->_adrZdc->datasStatic.nbCiblesOn = static_cast<uint8_t>(params.at(1).toUInt());  // nb cibles allumées
-
-    params.clear();
-    params = groupes.at(5).split(';');
-    _zdc->_adrZdc->datasStatic.joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
-    _zdc->_adrZdc->datasStatic.nbPointsJoker = static_cast<uint8_t>(params.at(1).toUInt());  // nb points joker
-
-    _zdc->_adrZdc->datasStatic.nbCouleurs = static_cast<uint8_t>(groupes.at(6).toUInt());  // nombre de couleurs utilisées
-
-    params.clear();
-    params = groupes.at(7).split(';');
-    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
-        _zdc->_adrZdc->datasStatic.nbPointscouleurs[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
-
+    // Paramétrage opérationnel
     play(); // lancement du jeu
 }
 
 void CJeu::on_trameAnnulationPartie(QByteArray tc)
 {
+
+}
+
+void CJeu::on_erreurParams(QByteArray tc)
+{
+    qDebug() << "Erreur de décodage de la trame de paramétrage : " << tc;
 
 } // méthode
