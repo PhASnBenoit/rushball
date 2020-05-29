@@ -19,8 +19,11 @@ public:
 
 private:
     Ui::CIhm *ui;
-
     CJeu *_jeu;  // composition dynamique
+
+private slots:
+    void on_erreurJeu(QString mess);
+    void on_info(QString mess);
 };
 
 #endif // CIHM_H

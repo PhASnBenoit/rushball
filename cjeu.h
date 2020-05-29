@@ -37,6 +37,7 @@ private:
 signals:
     void sig_playCommCibles();
     void sig_erreur(QString mess);
+    void sig_info(QString mess);
 
 public slots:
     void on_ciblesTouchees(QByteArray cibles);

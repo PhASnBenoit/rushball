@@ -17,7 +17,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_prot, &CProtocoleClient::sig_trameParametrage, this, &CJeu::on_trameParametrage);
     connect(_prot, &CProtocoleClient::sig_trameAnnulationPartie, this, &CJeu::on_trameAnnulationPartie);
     connect(_prot, &CProtocoleClient::sig_erreurParams, this, &CJeu::on_erreurParams);
-
+    emit sig_info("CJeu:CJeu : Services ZDC, Serveur, PRotocole activés.");
 } // méthode
 
 CJeu::~CJeu()
@@ -52,12 +52,15 @@ void CJeu::play()
 {
     // appelé lorsque le paramétrage est correct.
     
+    emit sig_info("CJeu::play : init du bandeau d'affichage.");
     // initialiser l'affichage des joueurs à faire
     //    _aff = new CCommAffichage();
 
+    emit sig_info("CJeu::play : init de la comm avec pupitre.");
     // init de la comm avec le pupitre
     //    _pup = new CCommPupitre();
 
+    emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
     // init thread de communication avec les cibles
     _etat = ETAT_JEU_EN_COURS;
     _pans = new CCommCibles();
@@ -68,6 +71,7 @@ void CJeu::play()
     connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
+    emit sig_info("CJeu::play : comm avec les cibles en cours.");
 } // méthode
 
 void CJeu::on_ciblesTouchees(QByteArray cibles)
@@ -99,17 +103,21 @@ void CJeu::on_trameConnexion(QString login, QString mdp, QString origine)
     // A FAIRE - mémoriser le type de client origine
 
     // réponse au client
-    if (_etat == ETAT_ATTENTE_CONNEXION)
+    if (_etat == ETAT_ATTENTE_CONNEXION) {
         rep = _prot->repondreAConnexion('P'); // mode paramétrage
-    else
+        emit sig_info("CJeu::on_trameConnexion : Paramétrage autorisé pour le client.");
+    } else {
         rep = _prot->repondreAConnexion('S'); // mode suivi
-
-    // gérer mode suivi ou Paramétrage
-}
+        emit sig_info("CJeu::on_trameConnexion : Suivi autorisé pour le client.");
+    } // else
+    _serv->repondreAuClient(rep);
+    emit sig_info("CJeu::on_trameConnexion : Réponse encvoyée au client.");
+} // method
 
 void CJeu::on_trameParametrage(QByteArray tc)
 {
-    // Paramétrage opérationnel
+    emit sig_info("CJeu::on_trameParametrage : Réception paramétrage correcte : "+tc);
+
     play(); // lancement du jeu
 }
 

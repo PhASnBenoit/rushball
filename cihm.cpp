@@ -9,10 +9,21 @@ CIhm::CIhm(QWidget *parent) :
 
     // composition dynamique
     _jeu = new CJeu(this);
+    connect(_jeu, &CJeu::sig_erreur, this, &CIhm::on_erreurJeu);
 }
 
 CIhm::~CIhm()
 {
     delete _jeu;
     delete ui;
+}
+
+void CIhm::on_erreurJeu(QString mess)
+{
+    ui->teErreurs->append(mess);
+}
+
+void CIhm::on_info(QString mess)
+{
+    ui->teSuivi->append(mess);
 }
