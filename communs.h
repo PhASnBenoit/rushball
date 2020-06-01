@@ -16,6 +16,9 @@
 #define ADR_BASE_PAN 0x31   // adresse de base du premier panneau
 // PORT SERVEUR
 #define PORT 4444  // A METTRE DANS CONFIG.INI
+// JEU
+#define ETAT_ATTENTE_CONNEXION 0
+#define ETAT_JEU_EN_COURS 1
 
 typedef enum couleurs {
     ETEINT,

@@ -5,7 +5,9 @@
 //#include <cserveurtcp.h>
 #include "czdc.h"
 
-#define LG_TRAME 109
+#define LG_TRAME_PARAMS 109
+#define LG_TRAME_CONNEXION 38
+#define LG_TRAME_ANNULATION_PARTIE 8
 
 class CProtocleClient : public QObject
 {
@@ -26,10 +28,10 @@ private:
 
 signals:
     void sig_emettreVersClient(QByteArray tc);
-    void sig_trameParametrage(QByteArray tc);
-    void sig_trameConnexion(QString login, QString mdp, QString origine);
-    void sig_trameAnnulationPartie(QByteArray tc);
-    void sig_erreurParams(QByteArray tc);
+    void sig_paramsSaved(QByteArray tc);
+    void sig_connexionAsked(QString login, QString mdp, QString origine);
+    void sig_demandeAnnulationPartie(QByteArray tc);
+    void sig_erreur(QString mess);
 
 public slots:
     char on_trameClient(QByteArray tc);

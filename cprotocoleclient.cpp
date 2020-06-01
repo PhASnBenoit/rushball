@@ -20,13 +20,12 @@ QByteArray CProtocleClient::repondreAConnexion(char mode)
 
 bool CProtocleClient::verifierCrc16()
 {
-    return true;
     uint16_t crc16 = static_cast<uint16_t>((_tc[_tc.size()-3]<<8) + _tc[_tc.size()-2]);
     uint16_t crc16Calc = calculerCrc16();
     if (crc16 == crc16Calc)
         return true;
     else
-        return false;
+        return true; // pour ne pas avoir à calculer le CRC16
 }
 
 uint16_t CProtocleClient::calculerCrc16()
@@ -134,6 +133,7 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     int deb = _tc.indexOf(":",1); // recherche début trame
     if (deb == -1) { // si pas de car de début
         _tc.clear();
+        emit sig_erreur("CProtocleClient::on_trameClient : Pas de caractère de début de trame");
         return -1;
     } // if pas de car de debut
     _tc.remove(0, deb+1);  // on enlève tout avant le : au cas ou
@@ -143,14 +143,10 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     if (fin == -1) return 0; // on attend la suite
     _tc.remove(fin, _tc.size()-fin);  // au cas ou, on enlève tout après la fin
 
-    if (_tc.size() != LG_TRAME) {
-        _tc.clear();
-        return -1;
-    } // if size pas bon
-
     bool res = verifierCrc16();
     if (!res) {
         _tc.clear();
+        emit sig_erreur("CProtocleClient::on_trameClient : Erreur de CRC16");
         return -1;
     } // si crc mauvais
 
@@ -158,19 +154,34 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     QString login, mdp, origine;
     switch(_tc.at(1)) {
     case 'P':  // envoi du paramétrage
-        if (!decodeEtSauveParams()) // si RAS
-            emit sig_trameParametrage(_tc);
-        else
-            emit sig_erreurParams(_tc);
+        if (_tc.size() != LG_TRAME_PARAMS) {
+            _tc.clear();
+            return -1;
+        } // if size pas bon
+        if (_zdc->etatJeu() == ETAT_ATTENTE_CONNEXION) {
+            if (!decodeEtSauveParams()) // si RAS
+                emit sig_paramsSaved(_tc);
+            else
+                emit sig_erreur(QString(_tc));
+        } // if etat
         break;
     case 'X':   // demande de connexion
+        if (_tc.size() != LG_TRAME_CONNEXION) {
+            _tc.clear();
+            emit sig_erreur("CProtocleClient::on_trameClient : Trame X de longueur non conforme");
+            return -1;
+        } // if size pas bon
         if (!decodeLoginMdp(login, mdp, origine))
-            emit sig_trameConnexion(login, mdp, origine);
+            emit sig_connexionAsked(login, mdp, origine);
         else
-            emit sig_erreurParams(_tc);
+            emit sig_erreur(QString(_tc));
         break;
     case 'C':   // annulation de la partie
-        emit sig_trameAnnulationPartie(_tc);
+        if (_tc.size() != LG_TRAME_ANNULATION_PARTIE) {
+            _tc.clear();
+            return -1;
+        } // if size pas bon
+        emit sig_demandeAnnulationPartie(_tc);
         break;
     default:
         return -1;

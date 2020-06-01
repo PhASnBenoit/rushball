@@ -24,12 +24,14 @@ private slots:
     void on_disconnected();
     void on_error(QAbstractSocket::SocketError socketError);
     void on_acceptError(QAbstractSocket::SocketError socketError);
-    void on_readyRead();
+    void on_play();
+    void on_erreur(QString mess);  // relais vers CIhm
 
 signals:
-    void sig_trameClient(QByteArray tc);
     void sig_newConnection();
     void sig_disconnected();
+    void sig_play();  // signal relais pour CJeu
+    void sig_erreur(QString mess);
 };
 
 #endif // CSERVEURTCP_H

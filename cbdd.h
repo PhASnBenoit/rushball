@@ -2,6 +2,7 @@
 #define CBDD_H
 
 #include <QObject>
+#include <QDebug>
 
 class CBdd : public QObject
 {
