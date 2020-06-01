@@ -21,7 +21,7 @@ typedef struct datasDyn {
 
 typedef struct datasStatic {
     uint8_t nbreJoueurs;  // max 4
-    QString nomJoueurs[MAX_JOUEURS];
+    char nomJoueurs[MAX_JOUEURS][13];
     char modeJeu; // P(toutes cibles allumées) ou M (<=moitié des cibles allumées) ou B(extinction des cibles)
     char modeFinJeu;  // S(Score) ou T(temps)
     uint16_t cpt;  // score ou temps à atteindre

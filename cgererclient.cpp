@@ -21,7 +21,7 @@ CGererClient::CGererClient(QTcpSocket *sock)
 CGererClient::~CGererClient()
 {
     _sock->close();
-    delete _sock;
+    //delete _sock;
     delete _zdc;
     delete _bdd;
     delete _prot;
