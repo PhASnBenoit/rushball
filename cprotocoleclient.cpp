@@ -130,7 +130,7 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     _tc += tc;  // si la trame n'avait pas été recue complètement.
 
     //test et purge début trame
-    int deb = _tc.indexOf(":",1); // recherche début trame
+    int deb = _tc.indexOf(":",0); // recherche début trame
     if (deb == -1) { // si pas de car de début
         _tc.clear();
         emit sig_erreur("CProtocleClient::on_trameClient : Pas de caractère de début de trame");
@@ -139,7 +139,7 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     _tc.remove(0, deb+1);  // on enlève tout avant le : au cas ou
 
     // test et purge fin de trame
-    int fin = _tc.indexOf(":",2);
+    int fin = _tc.indexOf(":",1);
     if (fin == -1) return 0; // on attend la suite
     _tc.remove(fin, _tc.size()-fin);  // au cas ou, on enlève tout après la fin
 
@@ -152,7 +152,7 @@ char CProtocleClient::on_trameClient(QByteArray tc)
 
     // la trame existe et est bien formée
     QString login, mdp, origine;
-    switch(_tc.at(1)) {
+    switch(_tc.at(0)) {
     case 'P':  // envoi du paramétrage
         if (_tc.size() != LG_TRAME_PARAMS) {
             _tc.clear();
@@ -186,5 +186,5 @@ char CProtocleClient::on_trameClient(QByteArray tc)
     default:
         return -1;
     } //sw
-    return _tc.at(1);
+    return _tc.at(0);
 } // method

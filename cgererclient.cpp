@@ -15,6 +15,7 @@ CGererClient::CGererClient(QTcpSocket *sock)
 
     _bdd = new CBdd();
     _zdc = new CZdc();
+    _typeClient=0;  // client inconnu
 }
 
 CGererClient::~CGererClient()
@@ -24,6 +25,11 @@ CGererClient::~CGererClient()
     delete _zdc;
     delete _bdd;
     delete _prot;
+}
+
+bool CGererClient::isConnected()
+{
+    return _sock->state();
 }
 
 void CGererClient::on_readyRead()
@@ -39,15 +45,18 @@ void CGererClient::on_readyRead()
     // _prot->on_trameClient envoie un signal correspondant à la trame reçue
     if (commande == -1) // si erreur dans trame
         emit sig_erreur("CGererClient::on_readyRead : Erreur dans le format de la trame.");
+    emit sig_info("Commande "+QString(commande)+" bien reçue");
 }
 
 void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine)
 {
     QByteArray rep;
 
+    emit sig_info("CGererClient::on_connexionAsked : Connexion demandée");
     // vérification du login + mdp
-    if (!_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp
+    if (_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp
         // vérifier si premier connecté mode P ou mode S
+        emit sig_info("CGererClient::on_connexionAsked : Bon login/mdp");
     } else {
         rep = _prot->repondreAConnexion('0');
         repondreAuClient(rep);
@@ -56,7 +65,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
     } // else
 
     // A FAIRE - mémoriser le type de client origine
-    origine="EN ATTENTE";  // sert à rien
+    _typeClient = origine.at(0).toLatin1();
 
     // réponse au client
     if (_zdc->etatJeu() == ETAT_ATTENTE_CONNEXION) {
@@ -89,6 +98,11 @@ void CGererClient::on_trameAnnulationPartie(QByteArray tc)
 void CGererClient::on_erreur(QString mess)
 {
     emit sig_erreur(mess);
+}
+
+void CGererClient::on_info(QString mess)
+{
+    emit sig_info(mess);
 }
 
 void CGererClient::repondreAuClient(QByteArray rep)

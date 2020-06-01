@@ -12,6 +12,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     _serv = new CServeurTcp();  // mise en route du serveur TCP
     connect(_serv, &CServeurTcp::sig_newConnection, this, &CJeu::on_newConnection);
     connect(_serv, &CServeurTcp::sig_erreur, this, &CJeu::on_erreur);
+    connect(_serv, &CServeurTcp::sig_info, this, &CJeu::on_info);
     connect(_serv, &CServeurTcp::sig_disconnected, this, &CJeu::on_disconnected);
     connect(_serv, &CServeurTcp::sig_play, this, &CJeu::on_play);
     emit sig_info("CJeu:CJeu : Services ZDC, Serveur TCP activés.");
@@ -21,7 +22,7 @@ CJeu::~CJeu()
 {
     // arrêt serveur TCP
     delete _serv;
-
+/*
     // arrêt des threads
     if (_thPans != nullptr) {
         _thPans->quit();
@@ -41,13 +42,15 @@ CJeu::~CJeu()
         delete _thPup;
         delete _pup;
     } // if pup
+*/
     delete _zdc;
 } // méthode
 
 void CJeu::play()
 {
     // appelé lorsque le paramétrage est correct.
-    
+    _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
+
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
     // initialiser l'affichage des joueurs à faire
     //    _aff = new CCommAffichage();
@@ -59,7 +62,6 @@ void CJeu::play()
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
     /*
     // init thread de communication avec les cibles
-    _etat = ETAT_JEU_EN_COURS;
     _pans = new CCommCibles();
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
