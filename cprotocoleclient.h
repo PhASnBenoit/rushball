@@ -2,17 +2,17 @@
 #define CPROTOCOLECLIENT_H
 
 #include <QObject>
-#include <ccommclient.h>
+//#include <cserveurtcp.h>
 #include "czdc.h"
 
 #define LG_TRAME 109
 
-class CProtocoleClient : public QObject
+class CProtocleClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit CProtocoleClient(QObject *parent = nullptr);
-    ~CProtocoleClient();
+    explicit CProtocleClient(QObject *parent = nullptr);
+    ~CProtocleClient();
     QByteArray repondreAConnexion(char mode);
 
 private:
@@ -32,7 +32,7 @@ signals:
     void sig_erreurParams(QByteArray tc);
 
 public slots:
-    void on_trameClient(QByteArray tc);
+    char on_trameClient(QByteArray tc);
 
 };
 

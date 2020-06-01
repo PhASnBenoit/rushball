@@ -9,14 +9,15 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     // EVOLUTION 2021 : Plusieurs clients se connectent
     // ne permet qu'au premier client de lancer un paramètrage.
     // les autres clients qui se connecte n'auront qu'un suivi du jeu.
-    _serv = new CCommClient();  // mise en route du serveur TCP
-    _prot = new CProtocoleClient(this);
-    connect(_serv, &CCommClient::sig_trameClient, _prot, &CProtocoleClient::on_trameClient);
-    connect(_prot, &CProtocoleClient::sig_emettreVersClient, this, &CJeu::on_emettreVersClient);
-    connect(_prot, &CProtocoleClient::sig_trameConnexion, this, &CJeu::on_trameConnexion);
-    connect(_prot, &CProtocoleClient::sig_trameParametrage, this, &CJeu::on_trameParametrage);
-    connect(_prot, &CProtocoleClient::sig_trameAnnulationPartie, this, &CJeu::on_trameAnnulationPartie);
-    connect(_prot, &CProtocoleClient::sig_erreurParams, this, &CJeu::on_erreurParams);
+    _serv = new CServeurTcp();  // mise en route du serveur TCP
+    _prot = new CProtocleClient(this);
+    connect(_serv, &CServeurTcp::sig_newConnection, this, &CJeu::on_newConnection);
+    connect(_serv, &CServeurTcp::sig_trameClient, _prot, &CProtocleClient::on_trameClient);
+    connect(_prot, &CProtocleClient::sig_emettreVersClient, this, &CJeu::on_emettreVersClient);
+    connect(_prot, &CProtocleClient::sig_trameConnexion, this, &CJeu::on_trameConnexion);
+    connect(_prot, &CProtocleClient::sig_trameParametrage, this, &CJeu::on_trameParametrage);
+    connect(_prot, &CProtocleClient::sig_trameAnnulationPartie, this, &CJeu::on_trameAnnulationPartie);
+    connect(_prot, &CProtocleClient::sig_erreurParams, this, &CJeu::on_erreurParams);
     emit sig_info("CJeu:CJeu : Services ZDC, Serveur, PRotocole activés.");
 } // méthode
 
@@ -61,6 +62,7 @@ void CJeu::play()
     //    _pup = new CCommPupitre();
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
+    /*
     // init thread de communication avec les cibles
     _etat = ETAT_JEU_EN_COURS;
     _pans = new CCommCibles();
@@ -71,6 +73,7 @@ void CJeu::play()
     connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
+    */
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 } // méthode
 
@@ -84,6 +87,11 @@ void CJeu::on_ciblesTouchees(QByteArray cibles)
 void CJeu::on_emettreVersClient(QByteArray tc)
 {
     // préparer la réponse et l'envoyer au client
+}
+
+void CJeu::on_newConnection()
+{
+    emit sig_info("CJeu::on_newConnection : Un client vient de se connecter.");
 }
 
 void CJeu::on_trameConnexion(QString login, QString mdp, QString origine)
@@ -130,4 +138,4 @@ void CJeu::on_erreurParams(QByteArray tc)
 {
     qDebug() << "Erreur de décodage de la trame de paramétrage : " << tc;
 
-} // méthode
+}

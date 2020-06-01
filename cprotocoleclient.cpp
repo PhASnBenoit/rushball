@@ -1,16 +1,16 @@
 #include "cprotocoleclient.h"
 
-CProtocoleClient::CProtocoleClient(QObject *parent) : QObject(parent)
+CProtocleClient::CProtocleClient(QObject *parent) : QObject(parent)
 {
     _zdc = new CZdc();
 }
 
-CProtocoleClient::~CProtocoleClient()
+CProtocleClient::~CProtocleClient()
 {
     delete _zdc;
 }
 
-QByteArray CProtocoleClient::repondreAConnexion(char mode)
+QByteArray CProtocleClient::repondreAConnexion(char mode)
 {
     // cette méthode offre la possibilité de former une trame de réponse plus complexe.
     // si le protocole change
@@ -18,8 +18,9 @@ QByteArray CProtocoleClient::repondreAConnexion(char mode)
     return _rep;  // RAS
 }
 
-bool CProtocoleClient::verifierCrc16()
+bool CProtocleClient::verifierCrc16()
 {
+    return true;
     uint16_t crc16 = static_cast<uint16_t>((_tc[_tc.size()-3]<<8) + _tc[_tc.size()-2]);
     uint16_t crc16Calc = calculerCrc16();
     if (crc16 == crc16Calc)
@@ -28,7 +29,7 @@ bool CProtocoleClient::verifierCrc16()
         return false;
 }
 
-uint16_t CProtocoleClient::calculerCrc16()
+uint16_t CProtocleClient::calculerCrc16()
 {
     uint8_t nbDec;
     uint8_t yaun;
@@ -58,7 +59,7 @@ uint16_t CProtocoleClient::calculerCrc16()
     return crc;
 }
 
-int CProtocoleClient::decodeEtSauveParams()
+int CProtocleClient::decodeEtSauveParams()
 {
     // appelé lors de la réception du paramétrage
     // décoder la trame de paramétrage et la sauver dans la zdc
@@ -106,7 +107,7 @@ int CProtocoleClient::decodeEtSauveParams()
     return 0; // RAS
 }
 
-int CProtocoleClient::decodeLoginMdp(QString &login, QString &mdp, QString &origine)
+int CProtocleClient::decodeLoginMdp(QString &login, QString &mdp, QString &origine)
 {
     // appelé lors de la demande de connexion
     // décodage de la trame
@@ -123,7 +124,7 @@ int CProtocoleClient::decodeLoginMdp(QString &login, QString &mdp, QString &orig
     return 0;
 }
 
-void CProtocoleClient::on_trameClient(QByteArray tc)
+char CProtocleClient::on_trameClient(QByteArray tc)
 {
     // examen de la trame reçue
 
@@ -133,24 +134,24 @@ void CProtocoleClient::on_trameClient(QByteArray tc)
     int deb = _tc.indexOf(":",1); // recherche début trame
     if (deb == -1) { // si pas de car de début
         _tc.clear();
-        return;
+        return -1;
     } // if pas de car de debut
     _tc.remove(0, deb+1);  // on enlève tout avant le : au cas ou
 
     // test et purge fin de trame
     int fin = _tc.indexOf(":",2);
-    if (fin == -1) return; // on attend la suite
+    if (fin == -1) return 0; // on attend la suite
     _tc.remove(fin, _tc.size()-fin);  // au cas ou, on enlève tout après la fin
 
     if (_tc.size() != LG_TRAME) {
         _tc.clear();
-        return;
+        return -1;
     } // if size pas bon
 
     bool res = verifierCrc16();
     if (!res) {
         _tc.clear();
-        return;
+        return -1;
     } // si crc mauvais
 
     // la trame existe et est bien formée
@@ -171,6 +172,8 @@ void CProtocoleClient::on_trameClient(QByteArray tc)
     case 'C':   // annulation de la partie
         emit sig_trameAnnulationPartie(_tc);
         break;
+    default:
+        return -1;
     } //sw
-
+    return _tc.at(1);
 } // method

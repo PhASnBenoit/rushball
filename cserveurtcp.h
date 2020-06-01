@@ -1,23 +1,23 @@
-#ifndef CCOMMCLIENT_H
-#define CCOMMCLIENT_H
+#ifndef CSERVEURTCP_H
+#define CSERVEURTCP_H
 
 #include <QObject>
 #include <QTcpServer>
 #include <QTcpSocket>
 
 #include "communs.h"
+#include "cgererclient.h"
 
-class CCommClient : public QTcpServer
+class CServeurTcp : public QTcpServer
 {
         Q_OBJECT
 
 public:
-    CCommClient();
-    ~CCommClient();
-    int repondreAuClient(QByteArray rep);
+    CServeurTcp();
+    ~CServeurTcp();
 
 private:
-    QTcpSocket *_client;
+    QList<CGererClient *> _clients;  // liste des clients connectés
 
 private slots:
     void on_newConnection();
@@ -28,6 +28,8 @@ private slots:
 
 signals:
     void sig_trameClient(QByteArray tc);
+    void sig_newConnection();
+    void sig_disconnected();
 };
 
-#endif // CCOMMCLIENT_H
+#endif // CSERVEURTCP_H

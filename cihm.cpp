@@ -10,6 +10,7 @@ CIhm::CIhm(QWidget *parent) :
     // composition dynamique
     _jeu = new CJeu(this);
     connect(_jeu, &CJeu::sig_erreur, this, &CIhm::on_erreurJeu);
+    connect(_jeu, &CJeu::sig_info, this, &CIhm::on_info);
 }
 
 CIhm::~CIhm()

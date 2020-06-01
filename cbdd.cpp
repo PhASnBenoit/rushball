@@ -9,5 +9,5 @@ bool CBdd::verifierParamsConnexion(QString login, QString mdp)
 {
     // A FAIRE CODE DE CONTROLE DES PARAMETRES LOGIN
 
-    return true;
+    return true; // bonne connexion par défaut.
 }

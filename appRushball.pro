@@ -28,19 +28,19 @@ SOURCES += \
         main.cpp \
         cihm.cpp \
     cjeu.cpp \
-    ccommclient.cpp \
     cbdd.cpp \
     ccommcibles.cpp \
     ccommpupitre.cpp \
     ccommaffichage.cpp \
     czdc.cpp \
     ../biblis/ci2c.cpp \
-    cprotocoleclient.cpp
+    cserveurtcp.cpp \
+    cprotocoleclient.cpp \
+    cgererclient.cpp
 
 HEADERS += \
         cihm.h \
     cjeu.h \
-    ccommclient.h \
     cbdd.h \
     ccommcibles.h \
     ccommpupitre.h \
@@ -48,7 +48,9 @@ HEADERS += \
     czdc.h \
     ../biblis/ci2c.h \
     communs.h \
-    cprotocoleclient.h
+    cserveurtcp.h \
+    cprotocoleclient.h \
+    cgererclient.h
 
 FORMS += \
         cihm.ui

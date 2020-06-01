@@ -9,7 +9,7 @@
 #include "ccommcibles.h"
 #include "ccommpupitre.h"
 #include "ccommaffichage.h"
-#include "ccommclient.h"
+#include "cserveurtcp.h"
 #include "cprotocoleclient.h"
 
 #define ETAT_ATTENTE_CONNEXION 0
@@ -28,9 +28,9 @@ private:
     CZdc *_zdc;
     CCommCibles *_pans; // comm avec les panneaux
     CCommPupitre *_pup;
-    CCommClient *_serv;
+    CServeurTcp *_serv;
     CCommAffichage *_aff;
-    CProtocoleClient *_prot;
+    CProtocleClient *_prot;
     QThread *_thPans, *_thPup, *_thAff;
     uint8_t _etat;  // état du jeu 0=en attente connexion 1=1 client connecté 2=jeu en cours 3=jeu en cours avec plusieurs clients connectés
 
@@ -42,6 +42,7 @@ signals:
 public slots:
     void on_ciblesTouchees(QByteArray cibles);
     void on_emettreVersClient(QByteArray tc);
+    void on_newConnection();
     void on_trameConnexion(QString login, QString mdp, QString origine);
     void on_trameParametrage(QByteArray tc);
     void on_trameAnnulationPartie(QByteArray tc);
