@@ -24,13 +24,14 @@ private:
     CBdd *_bdd;
     CZdc *_zdc;
     char _typeClient;  // P=PC  M=Téléphone
+    char _etatClient;  // connecté, authentifié, principal
     void repondreAuClient(QByteArray rep);
 
 public slots:
     void on_readyRead();
     void on_connexionAsked(QString login, QString mdp, QString origine);
-    void on_paramsSaved();
-    void on_trameAnnulationPartie(QByteArray tc);
+    void on_newParamsReady(T_DATAS_STATIC *ds);
+    void on_annulationPartieAsked();
     void on_erreur(QString mess); // relais de CProtocoleClient
     void on_info(QString mess);
 

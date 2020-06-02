@@ -59,6 +59,7 @@ public:
     void clear();
     uint8_t etatJeu();
     void setEtatJeu(const uint8_t &etat);
+    void appliquerNewParams(T_DATAS_STATIC *ds);
 
 private:
 

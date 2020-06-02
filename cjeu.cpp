@@ -3,7 +3,7 @@
 CJeu::CJeu(QObject *parent) : QObject(parent)
 {
     _zdc = new CZdc();  // accès à la mémoire partagée commune
-    _zdc->setEtatJeu(ETAT_ATTENTE_CONNEXION);  // en attente de connexion d'un client
+    _zdc->setEtatJeu(ETAT_JEU_ATTENTE_CONNEXION);  // en attente de connexion d'un client
 
     // pour le moment, qu'un seul client autorisé à se connecter.
     // EVOLUTION 2021 : Plusieurs clients se connectent

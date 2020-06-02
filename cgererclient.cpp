@@ -9,19 +9,20 @@ CGererClient::CGererClient(QTcpSocket *sock)
 
     _prot = new CProtocleClient();
     connect(_prot, &CProtocleClient::sig_connexionAsked, this, &CGererClient::on_connexionAsked);
-    connect(_prot, &CProtocleClient::sig_paramsSaved, this, &CGererClient::on_paramsSaved);
-    connect(_prot, &CProtocleClient::sig_demandeAnnulationPartie, this, &CGererClient::on_trameAnnulationPartie);
+    connect(_prot, &CProtocleClient::sig_newParamsReady, this, &CGererClient::on_newParamsReady);
+    connect(_prot, &CProtocleClient::sig_annulationPartieAsked, this, &CGererClient::on_annulationPartieAsked);
     connect(_prot, &CProtocleClient::sig_erreur, this, &CGererClient::on_erreur);
 
     _bdd = new CBdd();
     _zdc = new CZdc();
     _typeClient=0;  // client inconnu
+    _etatClient = ETAT_CLIENT_CONNECTED;
 }
 
 CGererClient::~CGererClient()
 {
     _sock->close();
-    //delete _sock;
+    delete _sock;
     delete _zdc;
     delete _bdd;
     delete _prot;
@@ -52,36 +53,43 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
 {
     QByteArray rep;
 
-    emit sig_info("CGererClient::on_connexionAsked : Connexion demandée");
-    // vérification du login + mdp
-    if (_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp
-        // vérifier si premier connecté mode P ou mode S
-        emit sig_info("CGererClient::on_connexionAsked : Bon login/mdp");
-    } else {
-        rep = _prot->repondreAConnexion('0');
-        repondreAuClient(rep);
-        emit sig_erreur("Erreur d'identifiant de connexion."+login +" "+mdp);
-        return;
-    } // else
+    rep = _prot->repondreAConnexion('0');  // par défaut pas possible
+    if ( !(_etatClient|ETAT_CLIENT_CONNECTED)) {  // si client pas encore connecté
+        emit sig_info("CGererClient::on_connexionAsked : Connexion demandée");
+        // vérification du login + mdp
+        if (_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp
+            // vérifier si premier connecté mode P ou mode S
+            emit sig_info("CGererClient::on_connexionAsked : Bon login/mdp");
+        } else {
+            rep = _prot->repondreAConnexion('0');
+            repondreAuClient(rep);
+            emit sig_erreur("Erreur d'identifiant de connexion."+login +" "+mdp);
+            return;
+        } // else
 
-    // A FAIRE - mémoriser le type de client origine
-    _typeClient = origine.at(0).toLatin1();
+        // A FAIRE - mémoriser le type de client origine
+        _typeClient = origine.at(0).toLatin1();
 
-    // réponse au client
-    if (_zdc->etatJeu() == ETAT_ATTENTE_CONNEXION) {
-        rep = _prot->repondreAConnexion('P'); // mode paramétrage
-    } else {
-        rep = _prot->repondreAConnexion('S'); // mode suivi
-    } // else
+        // réponse au client
+        if (_zdc->etatJeu() == ETAT_JEU_ATTENTE_CONNEXION) {
+            _etatClient |= ETAT_CLIENT_PREMIER | ETAT_CLIENT_AUTHENTIFIED;
+            rep = _prot->repondreAConnexion('P'); // mode paramétrage
+        } else {
+            _etatClient |= ETAT_CLIENT_AUTHENTIFIED;
+            rep = _prot->repondreAConnexion('S'); // mode suivi
+        } // else
+    } // if si client pas connecté
     repondreAuClient(rep);
 } // method
 
-void CGererClient::on_paramsSaved()
+void CGererClient::on_newParamsReady(T_DATAS_STATIC *ds)
 {
     QByteArray rep;
 
     // réponse au client
-    if (_zdc->etatJeu() == ETAT_ATTENTE_CONNEXION) {
+    if (_zdc->etatJeu() == ETAT_JEU_ATTENTE_CONNEXION) {
+        _zdc->appliquerNewParams(ds);
+        _etatClient |= ETAT_CLIENT_PARAMETRED;
         rep = _prot->repondreAConnexion('1'); // accepté
     } else {
         rep = _prot->repondreAConnexion('0'); // Pas possible
@@ -90,9 +98,10 @@ void CGererClient::on_paramsSaved()
     emit sig_play();  // lance le jeu relayé par CServeurTcp
 } // méthode
 
-void CGererClient::on_trameAnnulationPartie(QByteArray tc)
+void CGererClient::on_annulationPartieAsked()
 {
-    qDebug() << tc;
+    QByteArray rep;
+    rep = _prot->repondreAConnexion('1'); // accepté
 }
 
 void CGererClient::on_erreur(QString mess)

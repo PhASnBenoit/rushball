@@ -79,5 +79,13 @@ void CZdc::setEtatJeu(const uint8_t &etat)
 {
     lock();
         _adrZdc->datasDyn.etat_jeu = etat;
+        unlock();
+}
+
+void CZdc::appliquerNewParams(T_DATAS_STATIC *ds)
+{
+    lock();
+    clear(); // réinitialise la zone mémoire
+    memcpy(&_adrZdc->datasStatic, ds, sizeof(T_DATAS_STATIC));
     unlock();
 }

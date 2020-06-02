@@ -2,12 +2,12 @@
 
 CProtocleClient::CProtocleClient(QObject *parent) : QObject(parent)
 {
-    _zdc = new CZdc();
+    _ds = new T_DATAS_STATIC;
 }
 
 CProtocleClient::~CProtocleClient()
 {
-    delete _zdc;
+    delete _ds;
 }
 
 QByteArray CProtocleClient::repondreAConnexion(char mode)
@@ -58,7 +58,7 @@ uint16_t CProtocleClient::calculerCrc16()
     return crc;
 }
 
-int CProtocleClient::decodeEtSauveParams()
+int CProtocleClient::decodeEtControleParams()
 {
     // appelé lors de la réception du paramétrage
     // décoder la trame de paramétrage et la sauver dans la zdc
@@ -66,44 +66,42 @@ int CProtocleClient::decodeEtSauveParams()
     groupes = _tc.split('|');
     QList<QByteArray> params;
 
-    _zdc->lock();
-    _zdc->clear(); // réinitialise la zone mémoire
-
-    _zdc->_adrZdc->datasStatic.nbreJoueurs = static_cast<uint8_t>(groupes.at(1).at(0)-0x30);  // nombre de joueurs
-    if ( (_zdc->_adrZdc->datasStatic.nbreJoueurs < 1) || (_zdc->_adrZdc->datasStatic.nbreJoueurs > 4)) {
-        _zdc->_adrZdc->datasStatic.nbreJoueurs=1;
+    bzero(_ds, sizeof (T_DATAS_STATIC));
+    _ds->nbreJoueurs = static_cast<uint8_t>(groupes.at(1).at(0)-0x30);  // nombre de joueurs
+    if ( (_ds->nbreJoueurs < 1) || (_ds->nbreJoueurs > 4)) {
+        _ds->nbreJoueurs=1;
         return -1; // erreur !
     } // if nbjoueur
-    // contrôler nombre de joueurs
 
     params = groupes.at(2).split(';');
-    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbreJoueurs ; i++)   // noms des joueurs
-        strcpy(_zdc->_adrZdc->datasStatic.nomJoueurs[i],params.at(i).toStdString().c_str());
+    for (int i=0 ; i<_ds->nbreJoueurs ; i++)   // noms des joueurs
+        strcpy(_ds->nomJoueurs[i],params.at(i).toStdString().c_str());
 
     params.clear();
     params = groupes.at(3).split(';');
-    _zdc->_adrZdc->datasStatic.modeJeu = params.at(0)[0]-0x30;  // mode de jeu
-    _zdc->_adrZdc->datasStatic.modeFinJeu = params.at(1)[0]-0x30;  // mode fin de jeu
-    _zdc->_adrZdc->datasStatic.cpt = static_cast<uint16_t>(params.at(2).toUInt());  // score ou temps de départ
+    _ds->modeJeu = params.at(0)[0]-0x30;  // mode de jeu
+    _ds->modeFinJeu = params.at(1)[0]-0x30;  // mode fin de jeu
+    _ds->cpt = static_cast<uint16_t>(params.at(2).toUInt());  // score ou temps de départ
 
-    _zdc->_adrZdc->datasStatic.nbPointsFaute = static_cast<uint8_t>(groupes.at(4).toUInt());  // nb points pour faute
+    _ds->nbPointsFaute = static_cast<uint8_t>(groupes.at(4).toUInt());  // nb points pour faute
 
     params.clear();
     params = groupes.at(5).split(';');
-    _zdc->_adrZdc->datasStatic.nbPanneaux = static_cast<uint8_t>(params.at(0)[0]-0x30);  // nb de panneau
-    _zdc->_adrZdc->datasStatic.nbCiblesOn = static_cast<uint8_t>(params.at(1).toUInt());  // nb cibles allumées
+    _ds->nbPanneaux = static_cast<uint8_t>(params.at(0)[0]-0x30);  // nb de panneau
+    _ds->nbCiblesOn = static_cast<uint8_t>(params.at(1).toUInt());  // nb cibles allumées
 
     params.clear();
     params = groupes.at(6).split(';');
-    _zdc->_adrZdc->datasStatic.joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
-    _zdc->_adrZdc->datasStatic.nbPointsJoker = static_cast<uint8_t>(params.at(1).toUInt());  // nb points joker
+    _ds->joker = static_cast<uint8_t>(params.at(0)[0]-0x30);  // présence joker
+    _ds->nbPointsJoker = static_cast<uint8_t>(params.at(1).toUInt());  // nb points joker
 
-    _zdc->_adrZdc->datasStatic.nbCouleurs = static_cast<uint8_t>(groupes.at(7).toUInt());  // nombre de couleurs utilisées
+    _ds->nbCouleurs = static_cast<uint8_t>(groupes.at(7).toUInt());  // nombre de couleurs utilisées
 
     params.clear();
     params = groupes.at(8).split(';');
-    for (int i=0 ; i<_zdc->_adrZdc->datasStatic.nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
-        _zdc->_adrZdc->datasStatic.nbPointscouleurs[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
+    for (int i=0 ; i<_ds->nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
+        _ds->nbPointscouleurs[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
+
 
     return 0; // RAS
 }
@@ -160,18 +158,11 @@ char CProtocleClient::on_trameClient(QByteArray tc)
             _tc.clear();
             return -1;
         } // if size pas bon
-        if (_zdc->etatJeu() == ETAT_ATTENTE_CONNEXION) {
-            if (!decodeEtSauveParams()) { // si RAS
-                emit sig_paramsSaved(_tc);
-                _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
-            } else {
-                emit sig_erreur(QString(_tc));
-            } // else decode
+        if (!decodeEtControleParams()) { // si RAS
+            emit sig_newParamsReady(_ds);
         } else {
-            // si pas possible à cause de l'état
-            emit sig_erreur("CProtocleClient::on_trameClient : Impossible car le paramétrage est déjà effectué");
-        } // else etat
-
+            emit sig_erreur(QString(_tc));
+        } // else decode
         break;
     case 'X':   // demande de connexion
         if (_tc.size() != LG_TRAME_CONNEXION) {
@@ -189,7 +180,7 @@ char CProtocleClient::on_trameClient(QByteArray tc)
             _tc.clear();
             return -1;
         } // if size pas bon
-        emit sig_demandeAnnulationPartie(_tc);
+        emit sig_annulationPartieAsked(_tc);
         break;
     default:
         return -1;

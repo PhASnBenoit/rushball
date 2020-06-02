@@ -20,17 +20,17 @@ public:
 private:
     QByteArray _tc;  // trame du client
     QByteArray _rep;  // trame de réponse
-    CZdc *_zdc;     // accès aux données communes    
+    T_DATAS_STATIC *_ds;  // buffer data statique
     bool verifierCrc16();
     uint16_t calculerCrc16();
-    int decodeEtSauveParams();
+    int decodeEtControleParams();
     int decodeLoginMdp(QString &login, QString &mdp, QString &origine);
 
 signals:
     void sig_emettreVersClient(QByteArray tc);
-    void sig_paramsSaved(QByteArray tc);
+    void sig_newParamsReady(T_DATAS_STATIC *ds);
     void sig_connexionAsked(QString login, QString mdp, QString origine);
-    void sig_demandeAnnulationPartie(QByteArray tc);
+    void sig_annulationPartieAsked(QByteArray tc);
     void sig_erreur(QString mess);
     void sig_info(QString mess);
 
