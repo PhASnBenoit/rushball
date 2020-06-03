@@ -26,7 +26,7 @@ void CServeurTcp::on_newConnection()
     gererClient = new CGererClient(client);
     connect(gererClient, &CGererClient::sig_info, this, &CServeurTcp::on_info);
     connect(gererClient, &CGererClient::sig_erreur, this, &CServeurTcp::on_erreur);
-//    connect(gererClient, &CGererClient::sig_play, this, &CServeurTcp::on_play);
+    connect(gererClient, &CGererClient::sig_play, this, &CServeurTcp::on_play);
     connect(client, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),
         [=](QAbstractSocket::SocketError socketError) {
         this->on_error(socketError);});

@@ -72,7 +72,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
 
         // réponse au client
         if (_zdc->etatJeu() == ETAT_JEU_ATTENTE_CONNEXION) {
-            _etatClient |= ETAT_CLIENT_PREMIER | ETAT_CLIENT_AUTHENTIFIED;
+            _etatClient = ETAT_CLIENT_PREMIER | ETAT_CLIENT_AUTHENTIFIED;
             rep = _prot->repondreAConnexion('P'); // mode paramétrage
         } else {
             _etatClient |= ETAT_CLIENT_AUTHENTIFIED;
@@ -87,21 +87,23 @@ void CGererClient::on_newParamsReady(T_DATAS_STATIC *ds)
     QByteArray rep;
 
     // réponse au client
-    if (_zdc->etatJeu() == ETAT_JEU_ATTENTE_CONNEXION) {
+    if ( (_zdc->etatJeu()==ETAT_JEU_ATTENTE_PARAMS)) {
         _zdc->appliquerNewParams(ds);
         _etatClient |= ETAT_CLIENT_PARAMETRED;
+        _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
         rep = _prot->repondreAConnexion('1'); // accepté
+        emit sig_play();  // lance le jeu relayé par CServeurTcp
     } else {
         rep = _prot->repondreAConnexion('0'); // Pas possible
     } // else
     repondreAuClient(rep);
-    emit sig_play();  // lance le jeu relayé par CServeurTcp
 } // méthode
 
 void CGererClient::on_annulationPartieAsked()
 {
     QByteArray rep;
     rep = _prot->repondreAConnexion('1'); // accepté
+    repondreAuClient(rep);
 }
 
 void CGererClient::on_erreur(QString mess)

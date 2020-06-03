@@ -18,7 +18,8 @@
 #define PORT 4444  // A METTRE DANS CONFIG.INI
 // JEU
 #define ETAT_JEU_ATTENTE_CONNEXION 1
-#define ETAT_JEU_EN_COURS 2
+#define ETAT_JEU_ATTENTE_PARAMS 2
+#define ETAT_JEU_EN_COURS 4
 // CLIENT CONNECTé
 #define ETAT_CLIENT_CONNECTED 1  // connexion TCP seule
 #define ETAT_CLIENT_AUTHENTIFIED 2 // Client authentifié correctement
