@@ -68,6 +68,18 @@ void CZdc::setCibles(bool *tabCibles)
     unlock();
 }
 
+int CZdc::setCiblesPour1Panneau(int noPan, uint8_t cibles)
+{
+    if (noPan>getNbPanneaux())
+        return -1;
+
+    lock();
+        for (int i=0 ; i<NB_CIBLES_PAN ; i++)
+            _adrZdc->datasDyn.toucheCibles[noPan][i] = cibles&((i+1)*2);
+    unlock();
+    return 0;
+}
+
 void CZdc::clear()
 {
     // RAZ de toutes les informations

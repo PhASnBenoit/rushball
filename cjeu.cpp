@@ -54,35 +54,38 @@ void CJeu::play()
     emit sig_info("CJeu::play : Le jeu commence...");
 
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
-    // A FAIRE afficher le titre pendant 5s
-    // A FAIRE le type de jeu pendant 5s
+    _aff = new CCommAffichage();
+    // A FAIRE afficher RUSHBALL et version pendant 5s
+    _aff->afficherBienvenue(5);  // 5s affichage
+    // A FAIRE afficher le type de jeu choisi pendant 5s
+    _aff->afficherTypeJeu(5);    // 5s
     // A FAIRE initialiser l'affichage des joueurs, scores.
+    _aff->afficherScores();
     // mettre à jour affichage à chaque changement
-    //_aff = new CCommAffichage();
 
     emit sig_info("CJeu::play : init de la comm avec pupitre.");
     // A FAIRE init de la comm avec le pupitre
-    //    _pup = new CCommPupitre();
+    _pup = new CCommPupitre();
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
 
     // init thread de communication avec les cibles
     // A FAIRE INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
-    _pans = new CCommCibles();
+    _pans = new CCommPanneaux();
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
     connect(_thPans, &QThread::finished, _pans, &QObject::deleteLater);
-    connect(this, &CJeu::sig_playCommCibles, _pans, &CCommCibles::on_playCommCibles);
-    connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
+    connect(this, &CJeu::sig_playCommCibles, _pans, &CCommPanneaux::on_playCommCibles);
+    connect(_pans, &CCommPanneaux::sig_finCycleCommPanneaux, this, &CJeu::on_cibleTouchee);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
 
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 } // méthode
 
-void CJeu::on_ciblesTouchees(QByteArray cibles)
+void CJeu::on_cibleTouchee(QByteArray cibles)
 {
-    // appelé à la fin d'un cycle de communication I2C avec les panneaux
+    // appelé dès qu'une cible est touchée
     qDebug() << cibles;
 }
 

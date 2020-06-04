@@ -1,20 +1,20 @@
-#include "ccommcibles.h"
+#include "ccommpanneaux.h"
 
-CCommCibles::CCommCibles(QObject *parent) : QObject(parent)
+CCommPanneaux::CCommPanneaux(QObject *parent) : QObject(parent)
 {
     _zdc = new CZdc();
     _i2c = CI2c::getInstance(this, '1');
     _pause = false;
-    connect(this, &CCommCibles::sig_replay, this, &CCommCibles::on_playCommCibles);
+    connect(this, &CCommPanneaux::sig_replay, this, &CCommPanneaux::on_playCommCibles);
 }
 
-CCommCibles::~CCommCibles()
+CCommPanneaux::~CCommPanneaux()
 {
     delete _i2c;
     delete _zdc;
 }
 
-void CCommCibles::on_playCommCibles()
+void CCommPanneaux::on_playCommCibles()
 {
     QByteArray cibles;
     uint8_t couleurs[3];
@@ -36,21 +36,25 @@ void CCommCibles::on_playCommCibles()
     for (int i=0 ; i<nbPanneaux ; i++) {
         _i2c->lire(static_cast<uint8_t>(ADR_BASE_PAN+i), &panneau, 1);
         cibles.append(static_cast<char>(panneau));
-        // SAUVER DANS ZDC ETAT CIBLES
-
+        // A FAIRE SAUVER DANS ZDC ETAT CIBLES
+        _zdc->setCiblesPour1Panneau(i);
+        if (panneau > 0) { // si cible touchée
+            emit sig_cibleTouchee();
+            break;
+        } // if panneau
     } //for
 
-    emit sig_ciblesTouchees(cibles);
+    emit sig_finCycleCommPanneaux(cibles);
     if (!_pause)  // on relance sauf si pause demandée
         emit sig_replay();
 }
 
-void CCommCibles::stop()
+void CCommPanneaux::stop()
 {
     _pause = true;
 }
 
-void CCommCibles::start()
+void CCommPanneaux::start()
 {
     _pause = false;
     on_playCommCibles();

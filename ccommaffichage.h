@@ -8,6 +8,9 @@ class CCommAffichage : public QObject
     Q_OBJECT
 public:
     explicit CCommAffichage(QObject *parent = nullptr);
+    void afficherBienvenue(int duree);
+    void afficherTypeJeu(int duree);
+    void afficherScores();
 
 signals:
 

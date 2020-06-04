@@ -6,12 +6,12 @@
 #include "czdc.h"
 #include "../biblis/ci2c.h"
 
-class CCommCibles : public QObject
+class CCommPanneaux : public QObject
 {
     Q_OBJECT
 public:
-    explicit CCommCibles(QObject *parent = nullptr);
-    ~CCommCibles();
+    explicit CCommPanneaux(QObject *parent = nullptr);
+    ~CCommPanneaux();
 
 private:
     CI2c *_i2c;
@@ -19,7 +19,8 @@ private:
     CZdc *_zdc;
 
 signals:
-    void sig_ciblesTouchees(QByteArray cible);
+    void sig_finCycleCommPanneaux(QByteArray cible);
+    void sig_cibleTouchee();
     void sig_replay();
 
 public slots:

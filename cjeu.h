@@ -7,7 +7,7 @@
 
 #include "cbdd.h"
 #include "czdc.h"
-#include "ccommcibles.h"
+#include "ccommpanneaux.h"
 #include "ccommpupitre.h"
 #include "ccommaffichage.h"
 #include "cserveurtcp.h"
@@ -24,7 +24,7 @@ public:
 private:
     CBdd *_bdd;
     CZdc *_zdc;
-    CCommCibles *_pans; // comm avec les panneaux
+    CCommPanneaux *_pans; // comm avec les panneaux
     CCommPupitre *_pup;
     CServeurTcp *_serv;
     CCommAffichage *_aff;
@@ -36,7 +36,7 @@ signals:
     void sig_playCommCibles();  // lance la comm I2C avec les panneaux
 
 public slots:
-    void on_ciblesTouchees(QByteArray cibles);
+    void on_cibleTouchee(QByteArray cibles);
     void on_newConnection();
     void on_disconnected();
     void on_erreur(QString mess);

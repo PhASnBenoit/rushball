@@ -56,6 +56,7 @@ public:
     uint8_t getNbPanneaux();
     void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
     void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
+    int setCiblesPour1Panneau(int noPan, uint8_t cibles);
     void clear();
     uint8_t etatJeu();
     void setEtatJeu(const uint8_t &etat);
