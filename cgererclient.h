@@ -39,6 +39,7 @@ signals:
     void sig_erreur(QString mess);
     void sig_info(QString mess);
     void sig_play();
+    void sig_annulationPartie();
 };
 
 #endif // CGERERCLIENT_H

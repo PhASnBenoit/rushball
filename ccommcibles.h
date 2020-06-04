@@ -23,7 +23,7 @@ signals:
     void sig_replay();
 
 public slots:
-    void on_play();
+    void on_playCommCibles();
     void stop();
     void start();
 };

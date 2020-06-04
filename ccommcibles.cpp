@@ -2,30 +2,31 @@
 
 CCommCibles::CCommCibles(QObject *parent) : QObject(parent)
 {
-
+    _zdc = new CZdc();
     _i2c = CI2c::getInstance(this, '1');
     _pause = false;
-    connect(this, &CCommCibles::sig_replay, this, &CCommCibles::on_play);
+    connect(this, &CCommCibles::sig_replay, this, &CCommCibles::on_playCommCibles);
 }
 
 CCommCibles::~CCommCibles()
 {
     delete _i2c;
+    delete _zdc;
 }
 
-void CCommCibles::on_play()
+void CCommCibles::on_playCommCibles()
 {
     QByteArray cibles;
     uint8_t couleurs[3];
     uint8_t panneau;
     // LIRE DANS ZDC NOMBRE DE PANNEAUX
-    int nbPanneaux = 8;  // Simulation
+    uint8_t nbPanneaux = _zdc->getNbPanneaux();  // Simulation
 
     // LIRE DANS ZDC COULEURS A AFFICHER
 
     // MISE A JOUR DES COULEURS
-    for (int i=0 ; i<nbPanneaux ; i++) {
-        couleurs[0] = static_cast<uint8_t>(ROUGE);
+    for (uint8_t i=0 ; i<nbPanneaux ; i++) {
+        couleurs[0] = ROUGE;
         couleurs[1] = VERT;
         couleurs[2] = ETEINT; // Simulation
         _i2c->ecrire(static_cast<uint8_t>(ADR_BASE_PAN+i), couleurs, 3);
@@ -52,5 +53,5 @@ void CCommCibles::stop()
 void CCommCibles::start()
 {
     _pause = false;
-    on_play();
+    on_playCommCibles();
 }

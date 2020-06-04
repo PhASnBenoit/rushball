@@ -33,6 +33,7 @@ private:
 signals:
     void sig_erreur(QString mess);
     void sig_info(QString mess);
+    void sig_playCommCibles();  // lance la comm I2C avec les panneaux
 
 public slots:
     void on_ciblesTouchees(QByteArray cibles);
@@ -41,6 +42,8 @@ public slots:
     void on_erreur(QString mess);
     void on_info(QString mess);
     void on_play();
+    void on_annulationPartie();
+
 };
 
 #endif // CJEU_H

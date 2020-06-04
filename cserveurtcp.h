@@ -25,15 +25,17 @@ private slots:
     void on_error(QAbstractSocket::SocketError socketError);
     void on_acceptError(QAbstractSocket::SocketError socketError);
     void on_play();
-    void on_erreur(QString mess);  // relais vers CIhm
-    void on_info(QString mess);  // relais vers CIhm
+    void on_erreur(QString mess);  // relais vers CJeu
+    void on_info(QString mess);  // relais vers CJeu
+    void on_annulationPartie();  // relais vers CJeu
 
 signals:
     void sig_newConnection();
     void sig_disconnected();
-    void sig_play();  // signal relais pour CJeu
+    void sig_play();  //  relais pour CJeu
     void sig_erreur(QString mess);
     void sig_info(QString mess);
+    void sig_annulationPartie();  //  relais pour CJeu
 };
 
 #endif // CSERVEURTCP_H

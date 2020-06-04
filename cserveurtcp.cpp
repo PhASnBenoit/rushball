@@ -73,5 +73,10 @@ void CServeurTcp::on_erreur(QString mess)
 
 void CServeurTcp::on_info(QString mess)
 {
-    emit sig_info(mess);  // relais pour ihm
+    emit sig_info(mess);  // relais pour cjeu
+}
+
+void CServeurTcp::on_annulationPartie()
+{
+    emit sig_annulationPartie();  // relais pour cjeu
 }

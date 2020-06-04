@@ -49,11 +49,11 @@ public:
     CZdc();
     ~CZdc();
 
-    T_ZDC *_adrZdc;
-
-    T_COULEURS *getCouleurs();
-    bool* getCibles();
-    bool* getCiblesByPanneau(uint8_t noPan);
+    QByteArray getCouleurs();  //
+    QByteArray getCouleursByPanneau(uint8_t noPan);
+    QByteArray getCibles();
+    QByteArray getCiblesByPanneau(uint8_t noPan);
+    uint8_t getNbPanneaux();
     void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
     void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
     void clear();
@@ -62,6 +62,7 @@ public:
     void appliquerNewParams(T_DATAS_STATIC *ds);
 
 private:
+    T_ZDC *_adrZdc;
 
 signals:
     void sig_erreur(QString mess);

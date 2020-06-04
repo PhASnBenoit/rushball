@@ -11,6 +11,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     // les autres clients qui se connecte n'auront qu'un suivi du jeu.
     _serv = new CServeurTcp();  // mise en route du serveur TCP
     connect(_serv, &CServeurTcp::sig_newConnection, this, &CJeu::on_newConnection);
+    connect(_serv, &CServeurTcp::sig_annulationPartie, this, &CJeu::on_annulationPartie);
     connect(_serv, &CServeurTcp::sig_erreur, this, &CJeu::on_erreur);
     connect(_serv, &CServeurTcp::sig_info, this, &CJeu::on_info);
     connect(_serv, &CServeurTcp::sig_disconnected, this, &CJeu::on_disconnected);
@@ -22,7 +23,7 @@ CJeu::~CJeu()
 {
     // arrêt serveur TCP
     delete _serv;
-/*
+
     // arrêt des threads
     if (_thPans != nullptr) {
         _thPans->quit();
@@ -42,7 +43,7 @@ CJeu::~CJeu()
         delete _thPup;
         delete _pup;
     } // if pup
-*/
+
     delete _zdc;
 } // méthode
 
@@ -50,27 +51,32 @@ void CJeu::play()
 {
     // appelé lorsque le paramétrage est correct.
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
+    emit sig_info("CJeu::play : Le jeu commence...");
 
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
-    // initialiser l'affichage des joueurs à faire
-    //    _aff = new CCommAffichage();
+    // A FAIRE afficher le titre pendant 5s
+    // A FAIRE le type de jeu pendant 5s
+    // A FAIRE initialiser l'affichage des joueurs, scores.
+    // mettre à jour affichage à chaque changement
+    //_aff = new CCommAffichage();
 
     emit sig_info("CJeu::play : init de la comm avec pupitre.");
-    // init de la comm avec le pupitre
+    // A FAIRE init de la comm avec le pupitre
     //    _pup = new CCommPupitre();
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
-    /*
+
     // init thread de communication avec les cibles
+    // A FAIRE INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
     _pans = new CCommCibles();
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
     connect(_thPans, &QThread::finished, _pans, &QObject::deleteLater);
-    connect(this, &CJeu::sig_playCommCibles, _pans, &CCommCibles::on_play);
+    connect(this, &CJeu::sig_playCommCibles, _pans, &CCommCibles::on_playCommCibles);
     connect(_pans, &CCommCibles::sig_ciblesTouchees, this, &CJeu::on_ciblesTouchees);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
-    */
+
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 } // méthode
 
@@ -94,6 +100,11 @@ void CJeu::on_play()
 {
     emit sig_info("CJeu::on_play : Lancement jeu, params correctes");
     play(); // lancement du jeu
+}
+
+void CJeu::on_annulationPartie()
+{
+
 }
 
 void CJeu::on_erreur(QString mess)

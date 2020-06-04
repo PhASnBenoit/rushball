@@ -75,7 +75,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
             _etatClient = ETAT_CLIENT_PREMIER | ETAT_CLIENT_AUTHENTIFIED;
             rep = _prot->repondreAConnexion('P'); // mode paramétrage
         } else {
-            _etatClient |= ETAT_CLIENT_AUTHENTIFIED;
+            _etatClient = ETAT_CLIENT_AUTHENTIFIED;
             rep = _prot->repondreAConnexion('S'); // mode suivi
         } // else
     } // if si client pas connecté
@@ -104,6 +104,7 @@ void CGererClient::on_annulationPartieAsked()
     QByteArray rep;
     rep = _prot->repondreAConnexion('1'); // accepté
     repondreAuClient(rep);
+    emit sig_annulationPartie();
 }
 
 void CGererClient::on_erreur(QString mess)

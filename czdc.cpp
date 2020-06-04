@@ -17,31 +17,41 @@ CZdc::~CZdc()
     detach();
 }
 
-T_COULEURS* CZdc::getCouleurs()
+QByteArray CZdc::getCouleurs()
 {
-    T_COULEURS *couleurs;
+    QByteArray couleurs;
     lock();
-        couleurs = &_adrZdc->datasDyn.couleurCibles[0][0];
+        for (int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
+            for(int j=0 ; i<NB_CIBLES_PAN ; i++)
+                couleurs.append(_adrZdc->datasDyn.couleurCibles[i][j]);
     unlock();
     return couleurs;
 }
 
-bool* CZdc::getCibles()
+QByteArray CZdc::getCibles()
 {
-    bool *cibles;
+    QByteArray cibles;
     lock();
-        cibles = &_adrZdc->datasDyn.toucheCibles[0][0];
+        for (int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
+            for(int j=0 ; i<NB_CIBLES_PAN ; i++)
+                cibles.append(_adrZdc->datasDyn.toucheCibles[i][j]);
     unlock();
     return cibles;
 }
 
-bool *CZdc::getCiblesByPanneau(uint8_t noPan)
+QByteArray CZdc::getCiblesByPanneau(uint8_t noPan)
 {
-    bool *cibles;
+    QByteArray cibles1Panneau;
+    cibles1Panneau.clear();
+
+    if (noPan>getNbPanneaux())
+        return cibles1Panneau;
+
     lock();
-        cibles = &_adrZdc->datasDyn.toucheCibles[noPan][0];
+        for (int i=0 ; i<NB_CIBLES_PAN ; i++)
+            cibles1Panneau.append(_adrZdc->datasDyn.toucheCibles[noPan][i]);
     unlock();
-    return cibles;
+    return cibles1Panneau;
 }
 
 void CZdc::setCouleurs(T_COULEURS *tabCouleurs)
@@ -75,17 +85,41 @@ uint8_t CZdc::etatJeu()
     return etat;
 }
 
+uint8_t CZdc::getNbPanneaux()
+{
+    uint8_t nbPan;
+    lock();
+        nbPan = _adrZdc->datasStatic.nbPanneaux;
+    unlock();
+    return nbPan;
+}
+
+QByteArray CZdc::getCouleursByPanneau(uint8_t noPan)
+{
+    QByteArray couls1Panneau;
+    couls1Panneau.clear();
+
+    if (noPan>getNbPanneaux())
+        return couls1Panneau;
+
+    lock();
+        for (int i=0 ; i<NB_CIBLES_PAN ; i++)
+            couls1Panneau.append(_adrZdc->datasDyn.couleurCibles[noPan][i]);
+    unlock();
+    return couls1Panneau;
+}
+
 void CZdc::setEtatJeu(const uint8_t &etat)
 {
     lock();
         _adrZdc->datasDyn.etat_jeu = etat;
-        unlock();
+    unlock();
 }
 
 void CZdc::appliquerNewParams(T_DATAS_STATIC *ds)
 {
-    lock();
     clear(); // réinitialise la zone mémoire
-    memcpy(&_adrZdc->datasStatic, ds, sizeof(T_DATAS_STATIC));
+    lock();
+        memcpy(&_adrZdc->datasStatic, ds, sizeof(T_DATAS_STATIC));
     unlock();
 }
