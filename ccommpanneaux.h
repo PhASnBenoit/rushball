@@ -19,7 +19,7 @@ private:
     CZdc *_zdc;
 
 signals:
-    void sig_finCycleCommPanneaux(QByteArray cible);
+    void sig_finCycleCommPanneaux();
     void sig_cibleTouchee();
     void sig_replay();
 

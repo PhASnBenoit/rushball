@@ -62,7 +62,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
             emit sig_info("CGererClient::on_connexionAsked : Bon login/mdp");
         } else {
             rep = _prot->repondreAConnexion('0');
-            repondreAuClient(rep);
+            envoyerAuClient(rep);
             emit sig_erreur("Erreur d'identifiant de connexion."+login +" "+mdp);
             return;
         } // else
@@ -79,7 +79,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
             rep = _prot->repondreAConnexion('S'); // mode suivi
         } // else
     } // if si client pas connecté
-    repondreAuClient(rep);
+    envoyerAuClient(rep);
 } // method
 
 void CGererClient::on_newParamsReady(T_DATAS_STATIC *ds)
@@ -96,14 +96,14 @@ void CGererClient::on_newParamsReady(T_DATAS_STATIC *ds)
     } else {
         rep = _prot->repondreAConnexion('0'); // Pas possible
     } // else
-    repondreAuClient(rep);
+    envoyerAuClient(rep);
 } // méthode
 
 void CGererClient::on_annulationPartieAsked()
 {
     QByteArray rep;
     rep = _prot->repondreAConnexion('1'); // accepté
-    repondreAuClient(rep);
+    envoyerAuClient(rep);
     emit sig_annulationPartie();
 }
 
@@ -117,7 +117,22 @@ void CGererClient::on_info(QString mess)
     emit sig_info(mess);
 }
 
-void CGererClient::repondreAuClient(QByteArray rep)
+void CGererClient::on_majScores()
+{
+    QByteArray req;
+    QList<QString> nomJoueurs;
+    QList<uint16_t> scores;
+
+    if (_zdc->etatJeu() == ETAT_JEU_EN_COURS) {
+        nomJoueurs = _zdc->getNomJoueurs();
+        scores = _zdc->getScores();
+        req = _prot->preparerTrameMajScores(_zdc->getNbJoueurs(), nomJoueurs, scores);
+        // A FAIRE ENVOYER AU CLIENT
+        envoyerAuClient(req);
+    } // if etat
+}
+
+void CGererClient::envoyerAuClient(QByteArray rep)
 {
     _sock->write(rep);
 }

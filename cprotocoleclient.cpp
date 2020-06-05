@@ -18,6 +18,30 @@ QByteArray CProtocleClient::repondreAConnexion(char mode)
     return _rep;  // RAS
 }
 
+QByteArray CProtocleClient::preparerTrameMajScores(uint8_t nbJoueurs, QList<QString> nomJoueurs, QList<uint16_t> scores)
+{
+    uint16_t crc;
+
+    _tc.clear();
+    _tc.append(':');
+    _tc.append('S');
+    _tc.append('|');
+    for (int i=0 ; i<nbJoueurs ; i++) {
+        _tc.append(13-nomJoueurs.at(i).trimmed().size(), ' '); // met les espaces en premier 13 car maxi
+        _tc.append(nomJoueurs.at(i));
+        _tc.append(':');
+        _tc.append(QString::number(scores.at(i)));
+    } // for
+    _tc.append('|');
+    _tc.append('c');  // à calculer
+    _tc.append('c');  // à calculer
+    _tc.append(':'); // fin de trame
+    crc = calculerCrc16();
+    _tc[_tc.size()-3] = static_cast<char>(crc>>8);  // mise en place du CRC16 PF
+    _tc[_tc.size()-2] = static_cast<char>(crc);  // pf
+    return _tc;
+}
+
 bool CProtocleClient::verifierCrc16()
 {
     uint16_t crc16 = static_cast<uint16_t>((_tc[_tc.size()-3]<<8) + _tc[_tc.size()-2]);
@@ -67,14 +91,14 @@ int CProtocleClient::decodeEtControleParams()
     QList<QByteArray> params;
 
     bzero(_ds, sizeof (T_DATAS_STATIC));
-    _ds->nbreJoueurs = static_cast<uint8_t>(groupes.at(1).at(0)-0x30);  // nombre de joueurs
-    if ( (_ds->nbreJoueurs < 1) || (_ds->nbreJoueurs > 4)) {
-        _ds->nbreJoueurs=1;
+    _ds->nbJoueurs = static_cast<uint8_t>(groupes.at(1).at(0)-0x30);  // nombre de joueurs
+    if ( (_ds->nbJoueurs < 1) || (_ds->nbJoueurs > 4)) {
+        _ds->nbJoueurs=1;
         return -1; // erreur !
     } // if nbjoueur
 
     params = groupes.at(2).split(';');
-    for (int i=0 ; i<_ds->nbreJoueurs ; i++)   // noms des joueurs
+    for (int i=0 ; i<_ds->nbJoueurs ; i++)   // noms des joueurs
         strcpy(_ds->nomJoueurs[i],params.at(i).toStdString().c_str());
 
     params.clear();

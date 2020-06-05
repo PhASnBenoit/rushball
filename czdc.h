@@ -20,7 +20,7 @@ typedef struct datasDyn {
 } T_DATAS_DYN;
 
 typedef struct datasStatic {
-    uint8_t nbreJoueurs;  // max 4
+    uint8_t nbJoueurs;  // max 4
     char nomJoueurs[MAX_JOUEURS][13];
     char modeJeu; // P(toutes cibles allumées) ou M (<=moitié des cibles allumées) ou B(extinction des cibles)
     char modeFinJeu;  // S(Score) ou T(temps)
@@ -54,6 +54,10 @@ public:
     QByteArray getCibles();
     QByteArray getCiblesByPanneau(uint8_t noPan);
     uint8_t getNbPanneaux();
+    uint8_t getNbJoueurs();
+    QList<QString> getNomJoueurs();
+    QList<uint16_t> getScores();
+    QString getNomJoueur(uint8_t num);
     void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
     void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
     int setCiblesPour1Panneau(int noPan, uint8_t cibles);

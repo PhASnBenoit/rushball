@@ -16,6 +16,7 @@ public:
     explicit CProtocleClient(QObject *parent = nullptr);
     ~CProtocleClient();
     QByteArray repondreAConnexion(char mode);
+    QByteArray preparerTrameMajScores(uint8_t nbJoueurs, QList<QString> nomJoueurs, QList<uint16_t> scores);
 
 private:
     QByteArray _tc;  // trame du client

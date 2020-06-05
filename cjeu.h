@@ -34,9 +34,10 @@ signals:
     void sig_erreur(QString mess);
     void sig_info(QString mess);
     void sig_playCommCibles();  // lance la comm I2C avec les panneaux
+    void sig_majScores(); // pour CCommAffichage
 
 public slots:
-    void on_cibleTouchee(QByteArray cibles);
+    void on_cibleTouchee();
     void on_newConnection();
     void on_disconnected();
     void on_erreur(QString mess);

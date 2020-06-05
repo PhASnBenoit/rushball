@@ -29,6 +29,9 @@ private slots:
     void on_info(QString mess);  // relais vers CJeu
     void on_annulationPartie();  // relais vers CJeu
 
+public slots:
+    void on_majScores();
+
 signals:
     void sig_newConnection();
     void sig_disconnected();
@@ -36,6 +39,7 @@ signals:
     void sig_erreur(QString mess);
     void sig_info(QString mess);
     void sig_annulationPartie();  //  relais pour CJeu
+    void sig_majScores();  // relais pour chaque CGererClient
 };
 
 #endif // CSERVEURTCP_H

@@ -106,6 +106,48 @@ uint8_t CZdc::getNbPanneaux()
     return nbPan;
 }
 
+uint8_t CZdc::getNbJoueurs()
+{
+    uint8_t nbJoueurs;
+    lock();
+        nbJoueurs = _adrZdc->datasStatic.nbJoueurs;
+    unlock();
+    return nbJoueurs;
+}
+
+QList<QString> CZdc::getNomJoueurs()
+{
+    QList<QString> nomJoueurs;
+    lock();
+        for (int i=0 ; i<_adrZdc->datasStatic.nbJoueurs ; i++) {
+                nomJoueurs.append(QString(_adrZdc->datasStatic.nomJoueurs[i]));
+        } // for
+    unlock();
+    return nomJoueurs;
+}
+
+QList<uint16_t> CZdc::getScores()
+{
+    QList<uint16_t> scores;
+    lock();
+        for (int i=0 ; i<_adrZdc->datasStatic.nbJoueurs ; i++) {
+                scores.append(_adrZdc->datasDyn.scores[i]);
+        } // for
+    unlock();
+    return scores;
+}
+
+QString CZdc::getNomJoueur(uint8_t num)
+{
+    QString nomJoueur="";
+    if (num > getNbJoueurs())
+        return nomJoueur;
+    lock();
+        nomJoueur = QString(_adrZdc->datasStatic.nomJoueurs[num]);
+    unlock();
+    return nomJoueur;
+}
+
 QByteArray CZdc::getCouleursByPanneau(uint8_t noPan)
 {
     QByteArray couls1Panneau;

@@ -16,7 +16,6 @@ CCommPanneaux::~CCommPanneaux()
 
 void CCommPanneaux::on_playCommCibles()
 {
-    QByteArray cibles;
     uint8_t couleurs[3];
     uint8_t panneau;
     // LIRE DANS ZDC NOMBRE DE PANNEAUX
@@ -35,16 +34,15 @@ void CCommPanneaux::on_playCommCibles()
     // TEST CIBLE TOUCHEE
     for (int i=0 ; i<nbPanneaux ; i++) {
         _i2c->lire(static_cast<uint8_t>(ADR_BASE_PAN+i), &panneau, 1);
-        cibles.append(static_cast<char>(panneau));
         // A FAIRE SAUVER DANS ZDC ETAT CIBLES
-        _zdc->setCiblesPour1Panneau(i);
+        _zdc->setCiblesPour1Panneau(i, panneau);
         if (panneau > 0) { // si cible touchée
             emit sig_cibleTouchee();
             break;
         } // if panneau
     } //for
 
-    emit sig_finCycleCommPanneaux(cibles);
+    emit sig_finCycleCommPanneaux();
     if (!_pause)  // on relance sauf si pause demandée
         emit sig_replay();
 }

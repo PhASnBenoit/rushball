@@ -25,7 +25,7 @@ private:
     CZdc *_zdc;
     char _typeClient;  // P=PC  M=Téléphone
     char _etatClient;  // connecté, authentifié, principal
-    void repondreAuClient(QByteArray rep);
+    void envoyerAuClient(QByteArray rep);
 
 public slots:
     void on_readyRead();
@@ -34,6 +34,7 @@ public slots:
     void on_annulationPartieAsked();
     void on_erreur(QString mess); // relais de CProtocoleClient
     void on_info(QString mess);
+    void on_majScores(); // envoyer trame de mise à jour des scores
 
 signals:
     void sig_erreur(QString mess);

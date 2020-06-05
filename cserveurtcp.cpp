@@ -25,6 +25,7 @@ void CServeurTcp::on_newConnection()
     client = nextPendingConnection(); // récupération de la socket client
     gererClient = new CGererClient(client);
     connect(gererClient, &CGererClient::sig_info, this, &CServeurTcp::on_info);
+    connect(this, &CServeurTcp::sig_majScores, gererClient, &CGererClient::on_majScores);
     connect(gererClient, &CGererClient::sig_erreur, this, &CServeurTcp::on_erreur);
     connect(gererClient, &CGererClient::sig_play, this, &CServeurTcp::on_play);
     connect(client, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),
@@ -79,4 +80,10 @@ void CServeurTcp::on_info(QString mess)
 void CServeurTcp::on_annulationPartie()
 {
     emit sig_annulationPartie();  // relais pour cjeu
+}
+
+void CServeurTcp::on_majScores()
+{
+    // A FAIRE pour chaque client connecté, envoyer trame de mise à jour des scores
+    emit sig_majScores();
 }

@@ -55,6 +55,8 @@ void CJeu::play()
 
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
     _aff = new CCommAffichage();
+    connect(this, &CJeu::sig_majScores, _aff, &CCommAffichage::afficherScores);  // mise à jour affichage score
+    connect(this, &CJeu::sig_majScores, _serv, &CServeurTcp::on_majScores);  // mise à jour affichage score
     // A FAIRE afficher RUSHBALL et version pendant 5s
     _aff->afficherBienvenue(5);  // 5s affichage
     // A FAIRE afficher le type de jeu choisi pendant 5s
@@ -83,10 +85,13 @@ void CJeu::play()
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 } // méthode
 
-void CJeu::on_cibleTouchee(QByteArray cibles)
+void CJeu::on_cibleTouchee()
 {
     // appelé dès qu'une cible est touchée
-    qDebug() << cibles;
+
+    // A FAIRE CALCULER LES NOUVELLES COULEURS
+    // A FAIRE CALCULER LES SCORES
+    // CHANGER DE A QUI CA VIENT
 }
 
 void CJeu::on_newConnection()
