@@ -124,7 +124,7 @@ int CProtocleClient::decodeEtControleParams()
     params.clear();
     params = groupes.at(8).split(';');
     for (int i=0 ; i<_ds->nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
-        _ds->nbPointscouleurs[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
+        _ds->nbPointsParCouleur[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
 
 
     return 0; // RAS

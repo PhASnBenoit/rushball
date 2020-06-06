@@ -34,7 +34,7 @@ public slots:
     void on_annulationPartieAsked();
     void on_erreur(QString mess); // relais de CProtocoleClient
     void on_info(QString mess);
-    void on_majScores(); // envoyer trame de mise à jour des scores
+    void on_majScores(uint8_t aQuiLeTour); // envoyer trame de mise à jour des scores
 
 signals:
     void sig_erreur(QString mess);

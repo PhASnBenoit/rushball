@@ -54,6 +54,15 @@ QByteArray CZdc::getCiblesByPanneau(uint8_t noPan)
     return cibles1Panneau;
 }
 
+uint8_t CZdc::getNbCouleurs()
+{
+    uint8_t nbCouls;
+    lock();
+        nbCouls = _adrZdc->datasStatic.nbCouleurs;
+    unlock();
+    return nbCouls;
+}
+
 void CZdc::setCouleurs(T_COULEURS *tabCouleurs)
 {
     lock();

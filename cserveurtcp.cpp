@@ -82,8 +82,8 @@ void CServeurTcp::on_annulationPartie()
     emit sig_annulationPartie();  // relais pour cjeu
 }
 
-void CServeurTcp::on_majScores()
+void CServeurTcp::on_majScores(uint8_t aQuiLeTour)
 {
     // A FAIRE pour chaque client connecté, envoyer trame de mise à jour des scores
-    emit sig_majScores();
+    emit sig_majScores(aQuiLeTour);
 }

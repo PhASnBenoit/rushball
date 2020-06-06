@@ -32,7 +32,7 @@ typedef struct datasStatic {
     bool joker;  // Joker prévu ou non
     uint16_t nbPointsJoker; // nombre de points si joker atteint
     uint8_t nbCouleurs;  // sans couleur joker
-    uint16_t nbPointscouleurs[MAX_NB_COULEURS];  // indice 0 vaut toujours 0 car cible éteinte
+    uint16_t nbPointsParCouleur[MAX_NB_COULEURS];  // indice 0 vaut toujours 0 car cible éteinte
 } T_DATAS_STATIC;
 
 typedef struct zdc {
@@ -54,6 +54,7 @@ public:
     QByteArray getCouleursByPanneau(uint8_t noPan);
     QByteArray getCibles();
     QByteArray getCiblesByPanneau(uint8_t noPan);
+    uint8_t getNbCouleurs();
     uint8_t getNbPanneaux();
     uint8_t getNbJoueurs();
     QList<QString> getNomJoueurs();

@@ -117,7 +117,7 @@ void CGererClient::on_info(QString mess)
     emit sig_info(mess);
 }
 
-void CGererClient::on_majScores()
+void CGererClient::on_majScores(uint8_t aQuiLeTour)
 {
     QByteArray req;
     QList<QString> nomJoueurs;
@@ -125,6 +125,7 @@ void CGererClient::on_majScores()
 
     if (_zdc->etatJeu() == ETAT_JEU_EN_COURS) {
         nomJoueurs = _zdc->getNomJoueurs();
+// A FAIRE idée : Mettre le bit de poids fort à 1 pour signifier a qui vient le tour
         scores = _zdc->getScores();
         req = _prot->preparerTrameMajScores(_zdc->getNbJoueurs(), nomJoueurs, scores);
         envoyerAuClient(req);
