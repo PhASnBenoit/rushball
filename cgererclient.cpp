@@ -127,7 +127,6 @@ void CGererClient::on_majScores()
         nomJoueurs = _zdc->getNomJoueurs();
         scores = _zdc->getScores();
         req = _prot->preparerTrameMajScores(_zdc->getNbJoueurs(), nomJoueurs, scores);
-        // A FAIRE ENVOYER AU CLIENT
         envoyerAuClient(req);
     } // if etat
 }

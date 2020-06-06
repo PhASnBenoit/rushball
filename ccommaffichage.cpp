@@ -1,8 +1,8 @@
 #include "ccommaffichage.h"
 
-CCommAffichage::CCommAffichage(QObject *parent) : QObject(parent)
+CCommAffichage::CCommAffichage(QObject *parent, char modeFinJeu) : QObject(parent)
 {
-
+    _modeFinJeu = modeFinJeu;
 }
 
 void CCommAffichage::afficherBienvenue(int duree)

@@ -17,6 +17,7 @@ typedef struct datasDyn {
     T_COULEURS couleurCibles[MAX_PANS][NB_CIBLES_PAN];
     uint16_t scores[MAX_JOUEURS];
     uint8_t etat_jeu;  // état du jeu 0=en attente connexion 1=1 client connecté 2=jeu en cours 3=jeu en cours avec plusieurs clients connectés
+    uint8_t aQuiLeTour;
 } T_DATAS_DYN;
 
 typedef struct datasStatic {
@@ -65,6 +66,10 @@ public:
     uint8_t etatJeu();
     void setEtatJeu(const uint8_t &etat);
     void appliquerNewParams(T_DATAS_STATIC *ds);
+    char getModeJeu();
+    char getModeFinJeu();
+    uint8_t joueurSuivant();
+    uint8_t getAQuiLeTour();
 
 private:
     T_ZDC *_adrZdc;

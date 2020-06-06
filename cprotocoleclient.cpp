@@ -33,8 +33,8 @@ QByteArray CProtocleClient::preparerTrameMajScores(uint8_t nbJoueurs, QList<QStr
         _tc.append(QString::number(scores.at(i)));
     } // for
     _tc.append('|');
-    _tc.append('c');  // à calculer
-    _tc.append('c');  // à calculer
+    _tc.append('x');  // à calculer
+    _tc.append('x');  // à calculer
     _tc.append(':'); // fin de trame
     crc = calculerCrc16();
     _tc[_tc.size()-3] = static_cast<char>(crc>>8);  // mise en place du CRC16 PF

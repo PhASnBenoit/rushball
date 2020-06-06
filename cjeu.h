@@ -29,6 +29,7 @@ private:
     CServeurTcp *_serv;
     CCommAffichage *_aff;
     QThread *_thPans, *_thPup, *_thAff;
+    QByteArray genererCouleursDesCibles();
 
 signals:
     void sig_erreur(QString mess);
@@ -36,14 +37,15 @@ signals:
     void sig_playCommCibles();  // lance la comm I2C avec les panneaux
     void sig_majScores(); // pour CCommAffichage
 
-public slots:
-    void on_cibleTouchee();
+private slots:
+    void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
     void on_newConnection();
     void on_disconnected();
     void on_erreur(QString mess);
     void on_info(QString mess);
     void on_play();
     void on_annulationPartie();
+    void on_finCycleCommPanneau();
 
 };
 

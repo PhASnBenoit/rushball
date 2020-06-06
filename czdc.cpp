@@ -9,7 +9,7 @@ CZdc::CZdc()
             qDebug() << "CZdc::CZdc Erreur de création de la SHM";
         } // if erreur
     _adrZdc = static_cast<T_ZDC *>(data());
-    clear();  // toutes les infos à 0
+    clear();  // init de toute la ZDC
 }
 
 CZdc::~CZdc()
@@ -85,6 +85,8 @@ void CZdc::clear()
     // RAZ de toutes les informations
     lock();
         bzero(_adrZdc, sizeof(T_ZDC));
+        _adrZdc->datasDyn.aQuiLeTour=255;
+        _adrZdc->datasDyn.etat_jeu=ETAT_JEU_ATTENTE_CONNEXION;
     unlock();
 }
 
@@ -175,5 +177,48 @@ void CZdc::appliquerNewParams(T_DATAS_STATIC *ds)
     clear(); // réinitialise la zone mémoire
     lock();
         memcpy(&_adrZdc->datasStatic, ds, sizeof(T_DATAS_STATIC));
+        unlock();
+}
+
+char CZdc::getModeJeu()
+{
+    char mode;
+    lock();
+        mode = _adrZdc->datasStatic.modeJeu;
     unlock();
+    return mode;
+}
+
+char CZdc::getModeFinJeu()
+{
+    char fin;
+    lock();
+        fin = _adrZdc->datasStatic.modeFinJeu;
+    unlock();
+    return fin;
+}
+
+uint8_t CZdc::joueurSuivant()
+{
+    uint8_t val;
+    lock();
+        if (_adrZdc->datasDyn.aQuiLeTour==255) {
+            val = _adrZdc->datasDyn.aQuiLeTour = 0;
+        } else {
+            _adrZdc->datasDyn.aQuiLeTour++;
+            val = _adrZdc->datasDyn.aQuiLeTour;
+            if (_adrZdc->datasDyn.aQuiLeTour >= _adrZdc->datasStatic.nbJoueurs)
+                val = _adrZdc->datasDyn.aQuiLeTour = 0;
+        } // else
+    unlock();
+    return val;
+}
+
+uint8_t CZdc::getAQuiLeTour()
+{
+    uint8_t val;
+    lock();
+        val = _adrZdc->datasDyn.aQuiLeTour;
+    unlock();
+    return val;
 }

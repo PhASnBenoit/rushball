@@ -7,10 +7,13 @@ class CCommAffichage : public QObject
 {
     Q_OBJECT
 public:
-    explicit CCommAffichage(QObject *parent = nullptr);
+    explicit CCommAffichage(QObject *parent = nullptr, char modeFinJeu = 'S');
     void afficherBienvenue(int duree);
     void afficherTypeJeu(int duree);
     void afficherScores();
+
+private:
+    char _modeFinJeu;
 
 signals:
 

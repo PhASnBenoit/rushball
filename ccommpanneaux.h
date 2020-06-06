@@ -20,7 +20,7 @@ private:
 
 signals:
     void sig_finCycleCommPanneaux();
-    void sig_cibleTouchee();
+    void sig_cibleTouchee(uint8_t noPan, uint8_t cibles);
     void sig_replay();
 
 public slots:

@@ -53,8 +53,12 @@ void CJeu::play()
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
     emit sig_info("CJeu::play : Le jeu commence...");
 
+    // A FAIRE définir à qui le tour
+    suivant(255);
+
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
-    _aff = new CCommAffichage();
+    char modeFinJeu = _zdc->getModeFinJeu();
+    _aff = new CCommAffichage(this, modeFinJeu);  // temps ou points
     connect(this, &CJeu::sig_majScores, _aff, &CCommAffichage::afficherScores);  // mise à jour affichage score
     connect(this, &CJeu::sig_majScores, _serv, &CServeurTcp::on_majScores);  // mise à jour affichage score
     // A FAIRE afficher RUSHBALL et version pendant 5s
@@ -71,27 +75,50 @@ void CJeu::play()
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
 
-    // init thread de communication avec les cibles
     // A FAIRE INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
+    QByteArray couleurs =  genererCouleursDesCibles();
+
+    // init thread de communication avec les cibles
     _pans = new CCommPanneaux();
     _thPans = new QThread();
     _pans->moveToThread(_thPans);
     connect(_thPans, &QThread::finished, _pans, &QObject::deleteLater);
     connect(this, &CJeu::sig_playCommCibles, _pans, &CCommPanneaux::on_playCommCibles);
-    connect(_pans, &CCommPanneaux::sig_finCycleCommPanneaux, this, &CJeu::on_cibleTouchee);
+    connect(_pans, &CCommPanneaux::sig_cibleTouchee, this, &CJeu::on_cibleTouchee);
+    connect(_pans, &CCommPanneaux::sig_finCycleCommPanneaux, this, &CJeu::on_finCycleCommPanneau);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
 
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
+}
+
+QByteArray CJeu::genererCouleursDesCibles()
+{
+    char mode = _zdc->getModeJeu();
+    char fin = _zdc->getModeFinJeu();
+
+    // A FAIRE APPLICATION SELON LA REGLE
+
+    return _zdc->getCouleurs();
 } // méthode
 
-void CJeu::on_cibleTouchee()
+void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
 {
     // appelé dès qu'une cible est touchée
+    emit sig_info("CJeu::on_cibleTouchee : Panneau n°:"+QString::number(noPan+1)+" Cible n°:"+QString::number(cibles));
 
     // A FAIRE CALCULER LES NOUVELLES COULEURS
+        // suivant la règle choisie
+            // Calculer les nouveaux éclairages de toutes les cibles
+
     // A FAIRE CALCULER LES SCORES
+        // Chercher combien de point vaut la cible touchée
+        // mettre à jour le score correspondant dans zdc
+        // sauver dans la base de données pour l'historique partie
+        // avertir l'objet CCommAffichage pour mettre à jour l'affichage
+
     // CHANGER DE A QUI CA VIENT
+
 }
 
 void CJeu::on_newConnection()
@@ -112,7 +139,19 @@ void CJeu::on_play()
 
 void CJeu::on_annulationPartie()
 {
+    // appelée si demande d'annulation partie
 
+    // A FAIRE effacer toutes les données ZDC
+    // A FAIRE effacer les données de la partie dans la BDD
+    // A FAIRE déconnecter les clients
+    // A FAIRE remettre à l'état initial
+}
+
+void CJeu::on_finCycleCommPanneau()
+{
+    // appelée lorsque CCommPanneau a terminé son cycle de lecture écriture vers les panneaux
+    // Je m'en sert que pour l'affichage
+    emit sig_info("Cycle I2C terminé");
 }
 
 void CJeu::on_erreur(QString mess)
