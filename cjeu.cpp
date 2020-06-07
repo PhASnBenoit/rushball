@@ -72,6 +72,7 @@ void CJeu::play()
     emit sig_info("CJeu::play : init de la comm avec pupitre.");
     // A FAIRE init de la comm avec le pupitre
     _pup = new CCommPupitre();
+    connect(_pup, &CCommPupitre::sig_arret, this, &CJeu::on_arret);
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
 
@@ -234,6 +235,18 @@ void CJeu::on_finCycleCommPanneau()
     // appelée lorsque CCommPanneau a terminé son cycle de lecture écriture vers les panneaux
     // Je m'en sert que pour l'affichage
     emit sig_info("Cycle I2C terminé");
+}
+
+void CJeu::on_arret()
+{
+    // provoqué par le bouton STOP du pupitre
+
+    // A FAIRE Stopper le temps
+    // A FAIRE Stopper le raffraîchissement des scores
+
+    // A FAIRE DEFINIR LE FONCTIONNEMENT DU PUPITRE.
+    // A FAIRE Afficher fonctions MENU
+
 }
 
 void CJeu::on_erreur(QString mess)

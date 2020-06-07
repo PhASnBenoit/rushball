@@ -10,6 +10,7 @@ public:
     explicit CCommPupitre(QObject *parent = nullptr);
 
 signals:
+        void sig_arret();
 
 public slots:
 };

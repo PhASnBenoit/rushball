@@ -46,6 +46,7 @@ private slots:
     void on_play();
     void on_annulationPartie();
     void on_finCycleCommPanneau();
+    void on_arret();
 
 };
 
