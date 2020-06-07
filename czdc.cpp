@@ -269,3 +269,36 @@ void CZdc::allumer1AutreCible(uint8_t noPan, uint8_t cibles)
         } // sw
         unlock();
 }
+
+uint16_t CZdc::getNbPoint1Cible(uint8_t noPan, uint8_t cibles)
+{
+    uint8_t couleur;
+    uint16_t nbPoint;
+    lock();
+        switch(cibles) {
+        case 1: // cible du haut du panneau
+            couleur = _adrZdc->datasDyn.couleurCibles[noPan][0];
+            break;
+        case 2:
+            couleur = _adrZdc->datasDyn.couleurCibles[noPan][1];
+            break;
+        case 4:
+            couleur = _adrZdc->datasDyn.couleurCibles[noPan][2];
+            break;
+        default: // plusieurs cibles touchées sur un même panneau
+            couleur=ETEINT;  // PAS DE POINT
+            break;
+        } // sw
+        nbPoint = _adrZdc->datasStatic.nbPointsParCouleur[couleur];
+        unlock();
+        return nbPoint;
+}
+
+uint16_t CZdc::mettreAjourScore1Joueur(uint8_t qui, uint16_t nbPoints)
+{
+    uint16_t val;
+    lock();
+        val = _adrZdc->datasDyn.scores[qui]+nbPoints;
+    unlock();
+    return val;
+}

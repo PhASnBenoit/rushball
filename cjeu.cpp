@@ -103,7 +103,6 @@ QByteArray CJeu::genererCouleursDesCibles()
     uint8_t nbPans = _zdc->getNbPanneaux();
     uint8_t nbCouls = _zdc->getNbCouleurs();
     uint8_t nbCiblesAff = nbPans*NB_CIBLES_PAN/2;
-    uint8_t nbTotCibles = nbPans*NB_CIBLES_PAN;
     char mode = _zdc->getModeJeu();
 
     // suivant la règle choisie
@@ -192,13 +191,20 @@ void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
     // appelé dès qu'une cible est touchée
     emit sig_info("CJeu::on_cibleTouchee : Panneau n°:"+QString::number(noPan+1)+" Cible n°:"+QString::number(cibles));
 
-    // affichage des cibles suivant la règle choisie
+    // Chercher combien de point vaut la cible touchée
+    uint16_t nbPoints = _zdc->getNbPoint1Cible(noPan, cibles);
+    // mettre à jour le score correspondant dans zdc
+    uint8_t qui = _zdc->getAQuiLeTour();
+    _zdc->mettreAjourScore1Joueur(qui, nbPoints);
+// A FAIRE sauver dans la base de données pour l'historique partie
+
+    // maj des couleurs des cibles suite au touché
     switch(_zdc->getModeJeu()) {
     case 'M':  // jusqu'à moitié, elle se rallume
         _zdc->eteindre1Cible(noPan, cibles);
         break;
     case 'P': // toutes les cibles allumées, il faut les éteindre
-        // RESTE A FAIRE
+        // RESTE A FAIRE LE CODAGE DE LA METHODE
         _zdc->allumer1AutreCible(noPan, cibles);  // coordonnées de la cible pour conservation de la couleur
         break;
     default:
@@ -206,13 +212,6 @@ void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
         break;
     } // sw
 
-    // A FAIRE CALCULER LES SCORES
-        // Chercher combien de point vaut la cible touchée
-        // mettre à jour le score correspondant dans zdc
-        // sauver dans la base de données pour l'historique partie
-        // avertir l'objet CCommAffichage pour mettre à jour l'affichage
-
-    // CHANGER DE A QUI CA VIENT
     _zdc->joueurSuivant();
     emit sig_majScores(_zdc->getAQuiLeTour());
 }

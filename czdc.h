@@ -73,6 +73,8 @@ public:
     uint8_t getAQuiLeTour();
     void eteindre1Cible(uint8_t noPan, uint8_t cibles);
     void allumer1AutreCible(uint8_t noPan, uint8_t cibles);
+    uint16_t getNbPoint1Cible(uint8_t noPan, uint8_t cibles);
+    uint16_t mettreAjourScore1Joueur(uint8_t qui, uint16_t nbPoints);
 
 private:
     T_ZDC *_adrZdc;
