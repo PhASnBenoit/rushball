@@ -51,19 +51,13 @@ public:
     ~CZdc();
 
     QByteArray getCouleurs();  //
-    QByteArray getCouleursByPanneau(uint8_t noPan);
-    QByteArray getCibles();
-    QByteArray getCiblesByPanneau(uint8_t noPan);
     uint8_t getNbCouleurs();
     uint8_t getNbPanneaux();
     uint8_t getNbJoueurs();
     QList<QString> getNomJoueurs();
     QList<uint16_t> getScores();
-    QString getNomJoueur(uint8_t num);
     void setCouleurs(T_COULEURS *tabCouleurs);  // couleurs des cibles
-    void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
     int setCiblesPour1Panneau(int noPan, uint8_t cibles);
-    void clear();
     uint8_t etatJeu();
     void setEtatJeu(const uint8_t &etat);
     void appliquerNewParams(T_DATAS_STATIC *ds);
@@ -78,6 +72,15 @@ public:
 
 private:
     T_ZDC *_adrZdc;
+    QByteArray getCouleursByPanneau(uint8_t noPan);
+    T_COULEURS getCouleurCibleTouched(uint8_t noPan, uint8_t cibles);
+    QByteArray getCibles();
+    QByteArray getCiblesByPanneau(uint8_t noPan);
+    QString getNomJoueur(uint8_t num);
+    void setCibles(bool *tabCibles);  // touché des cibles, 1 seule cible touchée
+    void clear();
+    uint8_t getNbCiblesEteintes();
+    uint8_t getNumeroCibleTouched(uint8_t cibles);
 
 signals:
     void sig_erreur(QString mess);

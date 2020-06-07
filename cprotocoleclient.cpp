@@ -18,7 +18,7 @@ QByteArray CProtocleClient::repondreAConnexion(char mode)
     return _rep;  // RAS
 }
 
-QByteArray CProtocleClient::preparerTrameMajScores(uint8_t nbJoueurs, QList<QString> nomJoueurs, QList<uint16_t> scores)
+QByteArray CProtocleClient::preparerTrameMajScores(uint8_t nbJoueurs, QList<QString> nomJoueurs, QList<uint16_t> scores, uint8_t aQuiLeTour)
 {
     uint16_t crc;
 

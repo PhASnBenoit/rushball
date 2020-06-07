@@ -204,7 +204,6 @@ void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
         _zdc->eteindre1Cible(noPan, cibles);
         break;
     case 'P': // toutes les cibles allumées, il faut les éteindre
-        // RESTE A FAIRE LE CODAGE DE LA METHODE
         _zdc->allumer1AutreCible(noPan, cibles);  // coordonnées de la cible pour conservation de la couleur
         break;
     default:

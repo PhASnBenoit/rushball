@@ -22,7 +22,7 @@ QByteArray CZdc::getCouleurs()
     QByteArray couleurs;
     lock();
         for (int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
-            for(int j=0 ; i<NB_CIBLES_PAN ; i++)
+            for(int j=0 ; j<NB_CIBLES_PAN ; j++)
                 couleurs.append(_adrZdc->datasDyn.couleurCibles[i][j]);
     unlock();
     return couleurs;
@@ -33,7 +33,7 @@ QByteArray CZdc::getCibles()
     QByteArray cibles;
     lock();
         for (int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
-            for(int j=0 ; i<NB_CIBLES_PAN ; i++)
+            for(int j=0 ; j<NB_CIBLES_PAN ; j++)
                 cibles.append(_adrZdc->datasDyn.toucheCibles[i][j]);
     unlock();
     return cibles;
@@ -174,6 +174,28 @@ QByteArray CZdc::getCouleursByPanneau(uint8_t noPan)
     return couls1Panneau;
 }
 
+T_COULEURS CZdc::getCouleurCibleTouched(uint8_t noPan, uint8_t cibles)
+{
+    lock();
+    T_COULEURS couleur;
+    switch(cibles) {
+    case 1: // cible du haut du panneau
+        couleur = _adrZdc->datasDyn.couleurCibles[noPan][0];
+        break;
+    case 2:
+        couleur = _adrZdc->datasDyn.couleurCibles[noPan][1];
+        break;
+    case 4:
+        couleur = _adrZdc->datasDyn.couleurCibles[noPan][2];
+        break;
+    default: // plusieurs cibles touchées sur un même panneau
+        couleur=ETEINT;
+        break;
+    } // sw
+    unlock();
+    return couleur;
+}
+
 void CZdc::setEtatJeu(const uint8_t &etat)
 {
     lock();
@@ -253,21 +275,30 @@ void CZdc::eteindre1Cible(uint8_t noPan, uint8_t cibles)
 
 void CZdc::allumer1AutreCible(uint8_t noPan, uint8_t cibles)
 {
+    T_COULEURS couleur;
+    // compte le nombre de cibles éteintes
+    uint8_t nbce = getNbCiblesEteintes();
+    // générer un nombre aléatoire entre 1 et le nombre de cible éteinte
+    uint8_t nbAl = qrand()%(nbce+1);
+    // mémoriser la couleur de la cible actuelle
+    couleur = getCouleurCibleTouched(noPan, cibles);
     lock();
-        switch(cibles) {
-        case 1: // cible du haut du panneau
-            _adrZdc->datasDyn.couleurCibles[noPan][0] = ETEINT;
-            break;
-        case 2:
-            _adrZdc->datasDyn.couleurCibles[noPan][1] = ETEINT;
-            break;
-        case 4:
-            _adrZdc->datasDyn.couleurCibles[noPan][2] = ETEINT;
-            break;
-        default: // plusieurs cibles touchées sur un même panneau
-            break;
-        } // sw
-        unlock();
+        uint8_t cpt=0;
+        // Chercher la prochaine cible éteinte et la fixer à la couleur
+        for (int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
+            for (int j=0 ; j<NB_CIBLES_PAN ; j++)
+                if (_adrZdc->datasDyn.couleurCibles[i][j] == ETEINT) {
+                    cpt++;
+                    if (cpt == nbAl) {
+                        _adrZdc->datasDyn.couleurCibles[i][j] = couleur;
+                        i=9; // fin de boucle i
+                        break;
+                    } // if cpt
+                } // if ETEINT
+        // éteindre la cible actuelle
+        uint8_t no = getNumeroCibleTouched(cibles);
+        _adrZdc->datasDyn.couleurCibles[noPan][no] = ETEINT;
+    unlock();
 }
 
 uint16_t CZdc::getNbPoint1Cible(uint8_t noPan, uint8_t cibles)
@@ -301,4 +332,38 @@ uint16_t CZdc::mettreAjourScore1Joueur(uint8_t qui, uint16_t nbPoints)
         val = _adrZdc->datasDyn.scores[qui]+nbPoints;
     unlock();
     return val;
+}
+
+uint8_t CZdc::getNbCiblesEteintes()
+{
+    lock();
+    uint8_t cpt=0; // compteur de cibles éteintes
+    for(int i=0 ; i<_adrZdc->datasStatic.nbPanneaux ; i++)
+        for (int j=0 ; j<NB_CIBLES_PAN ; j++)
+            if (_adrZdc->datasDyn.couleurCibles[i][j]==0)
+                cpt++;
+    unlock();
+    return cpt;
+}
+
+uint8_t CZdc::getNumeroCibleTouched(uint8_t cibles)
+{
+    uint8_t pos;
+    lock();
+        switch(cibles) {
+        case 1: // cible du haut du panneau
+            pos = 0; // HAUT
+            break;
+        case 2:
+            pos = 1;  // MILIEU
+            break;
+        case 4:
+            pos = 2;  // BAS
+            break;
+        default: // plusieurs cibles touchées sur un même panneau
+            pos=2;  // MILIEU
+            break;
+        } // sw
+    unlock();
+    return pos;
 }
