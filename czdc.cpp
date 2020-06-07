@@ -231,3 +231,41 @@ uint8_t CZdc::getAQuiLeTour()
     unlock();
     return val;
 }
+
+void CZdc::eteindre1Cible(uint8_t noPan, uint8_t cibles)
+{
+    lock();
+        switch(cibles) {
+        case 1: // cible du haut du panneau
+            _adrZdc->datasDyn.couleurCibles[noPan][0] = ETEINT;
+            break;
+        case 2:
+            _adrZdc->datasDyn.couleurCibles[noPan][1] = ETEINT;
+            break;
+        case 4:
+            _adrZdc->datasDyn.couleurCibles[noPan][2] = ETEINT;
+            break;
+        default: // plusieurs cibles touchées sur un même panneau
+            break;
+        } // sw
+        unlock();
+}
+
+void CZdc::allumer1AutreCible(uint8_t noPan, uint8_t cibles)
+{
+    lock();
+        switch(cibles) {
+        case 1: // cible du haut du panneau
+            _adrZdc->datasDyn.couleurCibles[noPan][0] = ETEINT;
+            break;
+        case 2:
+            _adrZdc->datasDyn.couleurCibles[noPan][1] = ETEINT;
+            break;
+        case 4:
+            _adrZdc->datasDyn.couleurCibles[noPan][2] = ETEINT;
+            break;
+        default: // plusieurs cibles touchées sur un même panneau
+            break;
+        } // sw
+        unlock();
+}

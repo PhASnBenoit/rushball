@@ -15,7 +15,7 @@ void CCommAffichage::afficherTypeJeu(int duree)
 
 }
 
-void CCommAffichage::afficherScores(uint8_t aQuiLeTour)
+void CCommAffichage::on_afficherScores(uint8_t aQuiLeTour)
 {
 
 }

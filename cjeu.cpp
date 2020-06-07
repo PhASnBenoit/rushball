@@ -59,14 +59,14 @@ void CJeu::play()
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
     char modeFinJeu = _zdc->getModeFinJeu();
     _aff = new CCommAffichage(this, modeFinJeu);  // temps ou points
-    connect(this, &CJeu::sig_majScores, _aff, &CCommAffichage::afficherScores);  // mise à jour affichage score
+    connect(this, &CJeu::sig_majScores, _aff, &CCommAffichage::on_afficherScores);  // mise à jour affichage score
     connect(this, &CJeu::sig_majScores, _serv, &CServeurTcp::on_majScores);  // mise à jour affichage score
     // A FAIRE afficher RUSHBALL et version pendant 5s
     _aff->afficherBienvenue(5);  // 5s affichage
     // A FAIRE afficher le type de jeu choisi pendant 5s
     _aff->afficherTypeJeu(5);    // 5s
     // A FAIRE initialiser l'affichage des joueurs, scores.
-    _aff->afficherScores(_zdc->getAQuiLeTour());
+    _aff->on_afficherScores(_zdc->getAQuiLeTour());
     // mettre à jour affichage à chaque changement
 
     emit sig_info("CJeu::play : init de la comm avec pupitre.");
@@ -97,8 +97,13 @@ QByteArray CJeu::genererCouleursDesCibles()
 {
     // Appelé à l'initialisation du jeu seulement
 
+    int nb; // indice
+    int cpt;  // pour recherche couleur
+    uint8_t nbAlCoul;
     uint8_t nbPans = _zdc->getNbPanneaux();
+    uint8_t nbCouls = _zdc->getNbCouleurs();
     uint8_t nbCiblesAff = nbPans*NB_CIBLES_PAN/2;
+    uint8_t nbTotCibles = nbPans*NB_CIBLES_PAN;
     char mode = _zdc->getModeJeu();
 
     // suivant la règle choisie
@@ -108,8 +113,7 @@ QByteArray CJeu::genererCouleursDesCibles()
 
     switch(mode) {
 
-    case 'P': // toutes les cibles allumées, il faut les éteindre
-
+    case 'M':  // jusqu'à moitié, elle se rallume
         // génération aléatoires des cibles affichées
         for (int i = 0; i < nbCiblesAff; i++) {
             refCibles[i] = qrand()%(nbPans*3); // entre 1 et NbPC*3
@@ -122,13 +126,11 @@ QByteArray CJeu::genererCouleursDesCibles()
         } // for i
 
         // génération du tableau des couleurs pour les cibles sélectionnée
-        int nb;
         for (int i = 1; i <= 3; i++) { // forcement 3 lignes
             nb = i;
             for (int j = 1; j <= nbPans; j++) { // selon le nombre de panneau
-                int k;
                 bool trouve = false;
-                for (k = 0; k < nbCiblesAff; k++) { // recherche si cellule à éclairer
+                for (int k = 0; k < nbCiblesAff; k++) { // recherche si cellule à éclairer
                     if (nb == refCibles[k]) {
                         trouve = true;
                         break;
@@ -137,10 +139,10 @@ QByteArray CJeu::genererCouleursDesCibles()
                 if (!trouve) {
                     tabCibles[i-1][j-1] = ETEINT;
                 } else { // si cible à éclairée
-                    uint8_t nbAlCoul = 1+qrand()%(_zdc->getNbCouleurs());// generation aléatoire des couleurs
+                    nbAlCoul = 1+qrand()%nbCouls;// generation aléatoire des couleurs
                     // cherche la couleur
-                    int cpt=0;
-                    for (k=0 ; k<MAX_NB_COULEURS ; k++) {
+                    cpt=0;
+                    for (int k=0 ; k<MAX_NB_COULEURS ; k++) {
                         if (couleurs.at(k) > 0)
                             cpt++;
                         if (cpt == nbAlCoul) { // si trouvé couleur
@@ -156,10 +158,25 @@ QByteArray CJeu::genererCouleursDesCibles()
         _zdc->setCouleurs(&tabCibles[0][0]);
         break;
 
-    case 'M':  // jusqu'à moitié, elle se rallume
-
-        // A FAIRE CALCULER LES NOUVELLES COULEURS
-
+    case 'P': // toutes les cibles allumées, il faut les éteindre
+        // génération du tableau des couleurs pour les cibles sélectionnée
+        for (int i = 1; i <= 3; i++) { // forcement 3 lignes
+            for (int j = 1; j <= nbPans; j++) { // selon le nombre de panneau
+                nbAlCoul = 1+qrand()%nbCouls;// generation aléatoire des couleurs
+                // cherche la couleur
+                int cpt=0;
+                for (int k=0 ; k<MAX_NB_COULEURS ; k++) {
+                    if (couleurs.at(k) > 0)
+                        cpt++;
+                    if (cpt == nbAlCoul) { // si trouvé couleur
+                        tabCibles[i-1][j-1] = static_cast<T_COULEURS>(couleurs.at(k));
+                        break;
+                    } // if trouvé couleur
+                } // for k
+            } // for j
+        } // for i
+        // maj les couleurs
+        _zdc->setCouleurs(&tabCibles[0][0]);
         break;
 
     default:
@@ -168,30 +185,26 @@ QByteArray CJeu::genererCouleursDesCibles()
     } // sw
 
     return _zdc->getCouleurs();
-} // méthode
+}
 
 void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
 {
     // appelé dès qu'une cible est touchée
     emit sig_info("CJeu::on_cibleTouchee : Panneau n°:"+QString::number(noPan+1)+" Cible n°:"+QString::number(cibles));
 
-        // suivant la règle choisie
+    // affichage des cibles suivant la règle choisie
     switch(_zdc->getModeJeu()) {
-    case 'P': // toutes les cibles allumées, il faut les éteindre
-
-        // A FAIRE CALCULER LES NOUVELLES COULEURS
-
-        break;
     case 'M':  // jusqu'à moitié, elle se rallume
-
-        // A FAIRE CALCULER LES NOUVELLES COULEURS
-
+        _zdc->eteindre1Cible(noPan, cibles);
+        break;
+    case 'P': // toutes les cibles allumées, il faut les éteindre
+        // RESTE A FAIRE
+        _zdc->allumer1AutreCible(noPan, cibles);  // coordonnées de la cible pour conservation de la couleur
         break;
     default:
         emit sig_erreur("CJeu::on_cibleTouchee : Erreur de mode de jeu");
         break;
     } // sw
-            // Calculer les nouveaux éclairages de toutes les cibles
 
     // A FAIRE CALCULER LES SCORES
         // Chercher combien de point vaut la cible touchée

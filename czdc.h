@@ -71,6 +71,8 @@ public:
     char getModeFinJeu();
     uint8_t joueurSuivant();
     uint8_t getAQuiLeTour();
+    void eteindre1Cible(uint8_t noPan, uint8_t cibles);
+    void allumer1AutreCible(uint8_t noPan, uint8_t cibles);
 
 private:
     T_ZDC *_adrZdc;

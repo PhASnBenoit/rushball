@@ -10,7 +10,7 @@ public:
     explicit CCommAffichage(QObject *parent = nullptr, char modeFinJeu = 'S');
     void afficherBienvenue(int duree);
     void afficherTypeJeu(int duree);
-    void afficherScores(uint8_t aQuiLeTour);
+    void on_afficherScores(uint8_t aQuiLeTour);
 
 private:
     char _modeFinJeu;
