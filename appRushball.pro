@@ -35,7 +35,8 @@ SOURCES += \
     cserveurtcp.cpp \
     cprotocoleclient.cpp \
     cgererclient.cpp \
-    ccommpanneaux.cpp
+    ccommpanneaux.cpp \
+    cgererpupitre.cpp
 
 HEADERS += \
         cihm.h \
@@ -48,7 +49,8 @@ HEADERS += \
     cserveurtcp.h \
     cprotocoleclient.h \
     cgererclient.h \
-    ccommpanneaux.h
+    ccommpanneaux.h \
+    cgererpupitre.h
 
 FORMS += \
         cihm.ui

@@ -5,6 +5,12 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     _zdc = new CZdc();  // accès à la mémoire partagée commune
     _zdc->setEtatJeu(ETAT_JEU_ATTENTE_CONNEXION);  // en attente de connexion d'un client
 
+    _thPans = nullptr;
+    _thPup = nullptr;
+    _aff = nullptr;
+    _pans = nullptr;
+    _pup = nullptr;
+
     _tmr = new QTimer();
     _tmr->setInterval(1000); // un peu poins de 1s
     connect(_tmr, &QTimer::timeout, this, &CJeu::on_timeout);
@@ -40,12 +46,14 @@ CJeu::~CJeu()
         delete _thPans;
         delete _pans;
     } // if pans
-//    if (_thAff != nullptr) {
-//        _thAff->quit();
-//        _thAff->wait();
-//        delete _thAff;
+    if (_thPup != nullptr) {  // PAS SUR CREATION THREAD
+        _thPup->quit();
+        _thPup->wait();
+        delete _thPup;
+        delete _pup;
+    } // if aff
+    if (_aff != nullptr)
         delete _aff;
-//    } // if aff
 
     delete _zdc;
 } // méthode
@@ -88,6 +96,16 @@ void CJeu::play()
     connect(_pans, &CCommPanneaux::sig_finCycleCommPanneaux, this, &CJeu::on_finCycleCommPanneau);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
+
+    // init thread de gestion du pupitre
+    _pup = new CGererPupitre();
+    _thPup = new QThread();
+    _pup->moveToThread(_thPup);
+    connect(_thPup, &QThread::finished, _pup, &QObject::deleteLater);
+    connect(this, &CJeu::sig_playPupitre, _pup, &CGererPupitre::on_lirePupitre); // lance le travail du thread
+    connect(_pup, &CGererPupitre::sig_saisiePupitre, this, &CJeu::on_saisiePupitre); // retour de saisie
+    _thPup->start();  // lancement du thread
+    emit sig_playPupitre();  // lance la communication I2C
 
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 }
@@ -206,6 +224,7 @@ bool CJeu::isFinDePartie()
             return true;
         break;
     default:
+        emit sig_erreur("CJeu::isFinDePartie : Mode de fin de jeu non cohérent !");
         break;
     } // sw
     return false;
@@ -318,11 +337,18 @@ void CJeu::on_textEdited(QString mess)
 {
     // on vient de recevoir une touche du pupitre
     if (mess==TOUCHE_STOP) {
-        emit sig_pupitre("STOP demandé.");
+        emit sig_pupitre("STOP demandé."); // efface le linedit
         emit sig_stop();
     } // if
-
+    emit sig_info("touche frappée.");
     // PREVOIR MACHINE A ETATS POUR LE PUPITRE
+
+}
+
+void CJeu::on_saisiePupitre(QByteArray chaine)
+{
+    // appelé à la réception du caractères du pupitre
+   emit sig_pupitre("caractère tapé : " + chaine);
 }
 
 void CJeu::on_erreur(QString mess)

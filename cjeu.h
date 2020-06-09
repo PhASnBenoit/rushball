@@ -12,6 +12,7 @@
 #include "ccommaffichage.h"
 #include "cserveurtcp.h"
 #include "cprotocoleclient.h"
+#include "cgererpupitre.h"
 
 class CJeu : public QObject
 {
@@ -28,7 +29,9 @@ private:
     CCommPanneaux *_pans; // comm avec les panneaux
     CServeurTcp *_serv;
     CCommAffichage *_aff;
+    CGererPupitre *_pup;
     QThread *_thPans;
+    QThread *_thPup;
     //, *_thAff;
     QByteArray genererCouleursDesCibles();
     bool isFinDePartie();
@@ -42,6 +45,7 @@ signals:
     void sig_textEdited(QString mess);  // pour CCommPupitre
     void sig_pupitre(QString mess);
     void sig_finDePartie();
+    void sig_playPupitre();
 
 private slots:
     void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
@@ -59,6 +63,7 @@ private slots:
 
 public slots:
     void on_textEdited(QString mess); // recu de CIhm
+    void on_saisiePupitre(QByteArray chaine);
 };
 
 #endif // CJEU_H

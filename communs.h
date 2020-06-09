@@ -28,6 +28,7 @@
 #define ETAT_CLIENT_PREMIER 8  // premier client connecté
 
 // PUPITRE
+#define ETAT_MENU_PUPITRE 1
 #define TOUCHE_STOP "/"
 
 typedef enum couleurs {
