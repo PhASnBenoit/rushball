@@ -14,6 +14,7 @@ QByteArray CProtocleClient::repondreAConnexion(char mode)
 {
     // cette méthode offre la possibilité de former une trame de réponse plus complexe.
     // si le protocole change
+    _rep.clear();
     _rep[0] = mode;
     return _rep;  // RAS
 }

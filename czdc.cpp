@@ -208,7 +208,7 @@ void CZdc::appliquerNewParams(T_DATAS_STATIC *ds)
     clear(); // réinitialise la zone mémoire
     lock();
         memcpy(&_adrZdc->datasStatic, ds, sizeof(T_DATAS_STATIC));
-        unlock();
+    unlock();
 }
 
 char CZdc::getModeJeu()
@@ -330,6 +330,32 @@ uint16_t CZdc::mettreAjourScore1Joueur(uint8_t qui, uint16_t nbPoints)
     uint16_t val;
     lock();
         val = _adrZdc->datasDyn.scores[qui]+nbPoints;
+    unlock();
+    return val;
+}
+
+uint16_t CZdc::setDureePoints(uint16_t val)
+{
+    lock();
+        _adrZdc->datasDyn.dureePoints = val;
+    unlock();
+    return val;
+}
+
+uint16_t CZdc::getDureePoints()
+{
+    uint16_t val;
+    lock();
+        val = _adrZdc->datasDyn.dureePoints;
+    unlock();
+    return val;
+}
+
+uint16_t CZdc::getCpt()
+{
+    uint16_t val;
+    lock();
+        val = _adrZdc->datasStatic.cpt;
     unlock();
     return val;
 }

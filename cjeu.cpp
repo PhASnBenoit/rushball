@@ -5,6 +5,10 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     _zdc = new CZdc();  // accès à la mémoire partagée commune
     _zdc->setEtatJeu(ETAT_JEU_ATTENTE_CONNEXION);  // en attente de connexion d'un client
 
+    _tmr = new QTimer();
+    _tmr->setInterval(1000); // un peu poins de 1s
+    connect(_tmr, &QTimer::timeout, this, &CJeu::on_timeout);
+
     // pour le moment, qu'un seul client autorisé à se connecter.
     // EVOLUTION 2021 : Plusieurs clients se connectent
     // ne permet qu'au premier client de lancer un paramétrage.
@@ -16,11 +20,16 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_serv, &CServeurTcp::sig_info, this, &CJeu::on_info);
     connect(_serv, &CServeurTcp::sig_disconnected, this, &CJeu::on_disconnected);
     connect(_serv, &CServeurTcp::sig_play, this, &CJeu::on_play);
+    connect(this, &CJeu::sig_stop, this, &CJeu::on_stop);
+    connect(this, &CJeu::sig_finDePartie, this, &CJeu::on_finDePartie);
+
     emit sig_info("CJeu:CJeu : Services ZDC, Serveur TCP activés.");
 } // méthode
 
 CJeu::~CJeu()
 {
+    delete _tmr;
+
     // arrêt serveur TCP
     delete _serv;
 
@@ -31,30 +40,25 @@ CJeu::~CJeu()
         delete _thPans;
         delete _pans;
     } // if pans
-    if (_thAff != nullptr) {
-        _thAff->quit();
-        _thAff->wait();
-        delete _thAff;
+//    if (_thAff != nullptr) {
+//        _thAff->quit();
+//        _thAff->wait();
+//        delete _thAff;
         delete _aff;
-    } // if aff
-    if (_thPup != nullptr) {
-        _thPup->quit();
-        _thPup->wait();
-        delete _thPup;
-        delete _pup;
-    } // if pup
+//    } // if aff
 
     delete _zdc;
 } // méthode
 
 void CJeu::play()
 {
-    // appelé lorsque le paramétrage est correct.
+    // méthode appelée lorsque le paramétrage est correct.
 
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
     emit sig_info("CJeu::play : Le jeu commence...");
 
-    _zdc->joueurSuivant();  // Premier joueur
+    _zdc->setDureePoints(_zdc->getCpt());  // fixe le temps ou nb de points restant
+    _zdc->joueurSuivant();  // Premier joueur puisque le jeu démarre
 
     emit sig_info("CJeu::play : init du bandeau d'affichage.");
     char modeFinJeu = _zdc->getModeFinJeu();
@@ -67,15 +71,10 @@ void CJeu::play()
     _aff->afficherTypeJeu(5);    // 5s
     // A FAIRE initialiser l'affichage des joueurs, scores.
     _aff->on_afficherScores(_zdc->getAQuiLeTour());
-    // mettre à jour affichage à chaque changement
-
-    emit sig_info("CJeu::play : init de la comm avec pupitre.");
-    // A FAIRE init de la comm avec le pupitre
-    _pup = new CCommPupitre();
-    connect(_pup, &CCommPupitre::sig_arret, this, &CJeu::on_arret);
+    // mettre à jour affichage chaque seconde
+    _tmr->start(); // lance l'affichage des scores
 
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
-
     // INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
     genererCouleursDesCibles();
 
@@ -186,33 +185,64 @@ QByteArray CJeu::genererCouleursDesCibles()
     return _zdc->getCouleurs();
 }
 
+bool CJeu::isFinDePartie()
+{
+    QList<uint16_t> scores;
+    int nbj;  // nombre de joueur
+    char mfj = _zdc->getModeFinJeu();
+    uint16_t cpt = _zdc->getCpt();
+
+    switch(mfj) {
+    case 'S': // atteindre un nombre de points
+        scores = _zdc->getScores();
+        nbj = _zdc->getNbJoueurs();
+        for (int i=0 ; i<nbj ; i++) {
+            if (scores.at(i) >= cpt)
+                return true;
+        } // for i
+        break;
+    case 'T': // temps décroissant
+        if (cpt == 0)
+            return true;
+        break;
+    default:
+        break;
+    } // sw
+    return false;
+}
+
 void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
 {
     // appelé dès qu'une cible est touchée
     emit sig_info("CJeu::on_cibleTouchee : Panneau n°:"+QString::number(noPan+1)+" Cible n°:"+QString::number(cibles));
 
-    // Chercher combien de point vaut la cible touchée
-    uint16_t nbPoints = _zdc->getNbPoint1Cible(noPan, cibles);
-    // mettre à jour le score correspondant dans zdc
-    uint8_t qui = _zdc->getAQuiLeTour();
-    _zdc->mettreAjourScore1Joueur(qui, nbPoints);
-// A FAIRE sauver dans la base de données pour l'historique partie
+    if (_zdc->etatJeu() == ETAT_JEU_EN_COURS) {
+        // Chercher combien de point vaut la cible touchée
+        uint16_t nbPoints = _zdc->getNbPoint1Cible(noPan, cibles);
+        // mettre à jour le score correspondant dans zdc
+        uint8_t qui = _zdc->getAQuiLeTour();
+        _zdc->mettreAjourScore1Joueur(qui, nbPoints);
+    // A FAIRE sauver dans la base de données pour l'historique partie
 
-    // maj des couleurs des cibles suite au touché
-    switch(_zdc->getModeJeu()) {
-    case 'M':  // jusqu'à moitié, elle se rallume
-        _zdc->eteindre1Cible(noPan, cibles);
-        break;
-    case 'P': // toutes les cibles allumées, il faut les éteindre
-        _zdc->allumer1AutreCible(noPan, cibles);  // coordonnées de la cible pour conservation de la couleur
-        break;
-    default:
-        emit sig_erreur("CJeu::on_cibleTouchee : Erreur de mode de jeu");
-        break;
-    } // sw
+        // maj des couleurs des cibles suite au touché
+        switch(_zdc->getModeJeu()) {
+        case 'M':  // jusqu'à moitié, elle se rallume
+            _zdc->eteindre1Cible(noPan, cibles);
+            break;
+        case 'P': // toutes les cibles allumées, il faut les éteindre
+            _zdc->allumer1AutreCible(noPan, cibles);  // coordonnées de la cible pour conservation de la couleur
+            break;
+        default:
+            emit sig_erreur("CJeu::on_cibleTouchee : Erreur de mode de jeu");
+            break;
+        } // sw
 
-    _zdc->joueurSuivant();
-    emit sig_majScores(_zdc->getAQuiLeTour());
+        // A FAIRE tester fin de partie
+        if (isFinDePartie())
+            emit sig_finDePartie();
+        _zdc->joueurSuivant();
+        emit sig_majScores(_zdc->getAQuiLeTour());
+    } // if etat
 }
 
 void CJeu::on_newConnection()
@@ -248,16 +278,51 @@ void CJeu::on_finCycleCommPanneau()
     emit sig_info("Cycle I2C terminé");
 }
 
-void CJeu::on_arret()
+void CJeu::on_stop()
 {
     // provoqué par le bouton STOP du pupitre
+    _tmr->stop();
+    _zdc->setEtatJeu(ETAT_JEU_EN_PAUSE);
+}
 
-    // A FAIRE Stopper le temps
-    // A FAIRE Stopper le raffraîchissement des scores
+void CJeu::on_start()
+{
+    // méthode le jeu reprend après une correction
+    _tmr->start();
+    _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
+}
 
-    // A FAIRE DEFINIR LE FONCTIONNEMENT DU PUPITRE.
-    // A FAIRE Afficher fonctions MENU
+void CJeu::on_timeout()
+{
+    // méthode timer qui provoque l'affichage de la durée et des scores tous les intervalles
+    char mfj = _zdc->getModeFinJeu();
+    if (mfj == 'T') {
+        uint16_t val = _zdc->getDureePoints();
+        _zdc->setDureePoints(val-1);
+        emit sig_majScores(_zdc->getAQuiLeTour());
+        if (isFinDePartie())
+            emit sig_finDePartie();
+    } // if mfj
+}
 
+void CJeu::on_finDePartie()
+{
+    // A FAIRE fin de partie
+    // Arrêt timer
+    _tmr->stop();
+    _zdc->setEtatJeu(ETAT_JEU_ATTENTE_PARAMS);
+    // réinitialisation de tout
+}
+
+void CJeu::on_textEdited(QString mess)
+{
+    // on vient de recevoir une touche du pupitre
+    if (mess==TOUCHE_STOP) {
+        emit sig_pupitre("STOP demandé.");
+        emit sig_stop();
+    } // if
+
+    // PREVOIR MACHINE A ETATS POUR LE PUPITRE
 }
 
 void CJeu::on_erreur(QString mess)

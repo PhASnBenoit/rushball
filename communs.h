@@ -20,11 +20,15 @@
 #define ETAT_JEU_ATTENTE_CONNEXION 1
 #define ETAT_JEU_ATTENTE_PARAMS 2
 #define ETAT_JEU_EN_COURS 4
+#define ETAT_JEU_EN_PAUSE 8
 // CLIENT CONNECTé
 #define ETAT_CLIENT_CONNECTED 1  // connexion TCP seule
 #define ETAT_CLIENT_AUTHENTIFIED 2 // Client authentifié correctement
 #define ETAT_CLIENT_PARAMETRED 4 // client ayant paramétré
 #define ETAT_CLIENT_PREMIER 8  // premier client connecté
+
+// PUPITRE
+#define TOUCHE_STOP "/"
 
 typedef enum couleurs {
     ETEINT,

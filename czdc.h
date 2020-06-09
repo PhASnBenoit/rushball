@@ -18,6 +18,7 @@ typedef struct datasDyn {
     uint16_t scores[MAX_JOUEURS];
     uint8_t etat_jeu;  // état du jeu 0=en attente connexion 1=1 client connecté 2=jeu en cours 3=jeu en cours avec plusieurs clients connectés
     uint8_t aQuiLeTour;
+    uint16_t dureePoints;  // temps ou nb de points
 } T_DATAS_DYN;
 
 typedef struct datasStatic {
@@ -69,6 +70,9 @@ public:
     void allumer1AutreCible(uint8_t noPan, uint8_t cibles);
     uint16_t getNbPoint1Cible(uint8_t noPan, uint8_t cibles);
     uint16_t mettreAjourScore1Joueur(uint8_t qui, uint16_t nbPoints);
+    uint16_t setDureePoints(uint16_t val);
+    uint16_t getDureePoints();
+    uint16_t getCpt(); // valeur paramétrée de durée ou nb points
 
 private:
     T_ZDC *_adrZdc;

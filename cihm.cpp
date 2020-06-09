@@ -11,6 +11,8 @@ CIhm::CIhm(QWidget *parent) :
     _jeu = new CJeu(this);
     connect(_jeu, &CJeu::sig_erreur, this, &CIhm::on_erreurJeu);
     connect(_jeu, &CJeu::sig_info, this, &CIhm::on_info);
+    connect(ui->lePupitre, &QLineEdit::textEdited, _jeu, &CJeu::on_textEdited);
+    ui->lePupitre->setFocus();
 }
 
 CIhm::~CIhm()
@@ -27,4 +29,10 @@ void CIhm::on_erreurJeu(QString mess)
 void CIhm::on_info(QString mess)
 {
     ui->teSuivi->append(mess);
+}
+
+void CIhm::onPupitre(QString mess)
+{
+    ui->tePupitre->append(mess);
+    ui->lePupitre->clear();
 }

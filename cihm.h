@@ -24,6 +24,7 @@ private:
 private slots:
     void on_erreurJeu(QString mess);
     void on_info(QString mess);
+    void onPupitre(QString mess);
 };
 
 #endif // CIHM_H

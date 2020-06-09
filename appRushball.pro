@@ -29,7 +29,6 @@ SOURCES += \
         cihm.cpp \
     cjeu.cpp \
     cbdd.cpp \
-    ccommpupitre.cpp \
     ccommaffichage.cpp \
     czdc.cpp \
     ../biblis/ci2c.cpp \
@@ -42,7 +41,6 @@ HEADERS += \
         cihm.h \
     cjeu.h \
     cbdd.h \
-    ccommpupitre.h \
     ccommaffichage.h \
     czdc.h \
     ../biblis/ci2c.h \
