@@ -15,6 +15,21 @@ void CCommAffichage::afficherTypeJeu(int duree)
 
 }
 
+void CCommAffichage::afficherMenu()
+{
+
+}
+
+void CCommAffichage::afficherMenuSelected(int duree, QString optionMenu)
+{
+
+}
+
+void CCommAffichage::afficherTextePermanent(QString texte)
+{
+
+}
+
 void CCommAffichage::on_afficherScores(uint8_t aQuiLeTour)
 {
 

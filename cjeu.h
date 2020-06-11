@@ -39,13 +39,10 @@ private:
 signals:
     void sig_erreur(QString mess);
     void sig_info(QString mess);
-    void sig_stop();
     void sig_playCommCibles();  // lance la comm I2C avec les panneaux
     void sig_majScores(uint8_t aQuiLeTour); // pour CCommAffichage
-    void sig_textEdited(QString mess);  // pour CCommPupitre
-    void sig_pupitre(QString mess);
     void sig_finDePartie();
-    void sig_playPupitre();
+    void sig_toucheRecue(int touche);
 
 private slots:
     void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
@@ -62,8 +59,8 @@ private slots:
     void on_finDePartie();
 
 public slots:
-    void on_textEdited(QString mess); // recu de CIhm
-    void on_saisiePupitre(QByteArray chaine);
+    void on_toucheRecue(int touche);
+    void on_sigMenuPupitre(int menu);
 };
 
 #endif // CJEU_H

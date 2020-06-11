@@ -26,7 +26,6 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_serv, &CServeurTcp::sig_info, this, &CJeu::on_info);
     connect(_serv, &CServeurTcp::sig_disconnected, this, &CJeu::on_disconnected);
     connect(_serv, &CServeurTcp::sig_play, this, &CJeu::on_play);
-    connect(this, &CJeu::sig_stop, this, &CJeu::on_stop);
     connect(this, &CJeu::sig_finDePartie, this, &CJeu::on_finDePartie);
 
     emit sig_info("CJeu:CJeu : Services ZDC, Serveur TCP activés.");
@@ -97,15 +96,13 @@ void CJeu::play()
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
 
-    // init thread de gestion du pupitre
+    // Gestion du pupitre de correction des erreurs
     _pup = new CGererPupitre();
-    _thPup = new QThread();
-    _pup->moveToThread(_thPup);
-    connect(_thPup, &QThread::finished, _pup, &QObject::deleteLater);
-    connect(this, &CJeu::sig_playPupitre, _pup, &CGererPupitre::on_lirePupitre); // lance le travail du thread
-    connect(_pup, &CGererPupitre::sig_saisiePupitre, this, &CJeu::on_saisiePupitre); // retour de saisie
-    _thPup->start();  // lancement du thread
-    emit sig_playPupitre();  // lance la communication I2C
+    connect(this, &CJeu::sig_toucheRecue, _pup, &CGererPupitre::on_toucheRecue);
+    connect(_pup, &CGererPupitre::sig_stop, this, &CJeu::on_stop);
+    connect(_pup, &CGererPupitre::sig_start, this, &CJeu::on_start);
+    connect(_pup, &CGererPupitre::sig_afficherScores, this, &CJeu::on_sigMenuPupitre);
+
 
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 }
@@ -302,6 +299,7 @@ void CJeu::on_stop()
     // provoqué par le bouton STOP du pupitre
     _tmr->stop();
     _zdc->setEtatJeu(ETAT_JEU_EN_PAUSE);
+    _aff->afficherMenu(); // afficher le menu
 }
 
 void CJeu::on_start()
@@ -333,22 +331,17 @@ void CJeu::on_finDePartie()
     // réinitialisation de tout
 }
 
-void CJeu::on_textEdited(QString mess)
+void CJeu::on_toucheRecue(int touche)
 {
-    // on vient de recevoir une touche du pupitre
-    if (mess==TOUCHE_STOP) {
-        emit sig_pupitre("STOP demandé."); // efface le linedit
-        emit sig_stop();
-    } // if
-    emit sig_info("touche frappée.");
-    // PREVOIR MACHINE A ETATS POUR LE PUPITRE
-
+    emit sig_toucheRecue(touche); // vers CGererPupitre
 }
 
-void CJeu::on_saisiePupitre(QByteArray chaine)
+void CJeu::on_sigMenuPupitre(int menu)
 {
-    // appelé à la réception du caractères du pupitre
-   emit sig_pupitre("caractère tapé : " + chaine);
+    switch(menu){
+    case ETAT_PUPITRE_AFFICHER_SCORES:
+        break;
+    } // sw
 }
 
 void CJeu::on_erreur(QString mess)

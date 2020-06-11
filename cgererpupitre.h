@@ -3,24 +3,30 @@
 
 #include <QObject>
 #include <QTextStream>
+#include "ccommaffichage.h"
+#include "communs.h"
 
 class CGererPupitre : public QObject
 {
     Q_OBJECT
 public:
-    explicit CGererPupitre(QObject *parent = nullptr);
+    explicit CGererPupitre(QObject *parent = nullptr, CCommAffichage *aff = nullptr);
     ~CGererPupitre();
+    void on_toucheRecue(int touche);
 
 private:
-
- //   bool _stop;
+    int _etatPupitre;
+    CCommAffichage *_aff;
+    void traiterSaisie();
 
 signals:
-    void sig_saisiePupitre(QByteArray chaine);
+    void sig_stop();
+    void sig_start();
+    void sig_afficherScores();
+
 
 public slots:
-    void on_lirePupitre();
- //   void on_stopLirePupitre();
+
 };
 
 #endif // CGERERPUPITRE_H
