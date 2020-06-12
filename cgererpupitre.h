@@ -17,13 +17,13 @@ public:
 private:
     int _etatPupitre;
     CCommAffichage *_aff;
-    void traiterSaisie();
+    void traiterSaisie(int touche);
+    int _touches[5];  // sauvgarde d'un ensemble de touches
+    int _ind; // indice de sauvegarde touche
 
 signals:
     void sig_stop();
     void sig_start();
-    void sig_afficherScores();
-
 
 public slots:
 

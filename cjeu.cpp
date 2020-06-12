@@ -336,14 +336,6 @@ void CJeu::on_toucheRecue(int touche)
     emit sig_toucheRecue(touche); // vers CGererPupitre
 }
 
-void CJeu::on_sigMenuPupitre(int menu)
-{
-    switch(menu){
-    case ETAT_PUPITRE_AFFICHER_SCORES:
-        break;
-    } // sw
-}
-
 void CJeu::on_erreur(QString mess)
 {
     emit sig_erreur(mess);  // remontée des erreurs à l'IHM

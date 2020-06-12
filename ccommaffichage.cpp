@@ -30,7 +30,12 @@ void CCommAffichage::afficherTextePermanent(QString texte)
 
 }
 
-void CCommAffichage::on_afficherScores(uint8_t aQuiLeTour)
+void CCommAffichage::afficherSortieMenu(int duree)
 {
 
+}
+
+void CCommAffichage::on_afficherScores(uint8_t aQuiLeTour)
+{
+    // si aQuiLeTour == 0
 }

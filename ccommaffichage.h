@@ -14,6 +14,7 @@ public:
     void afficherMenu();
     void afficherMenuSelected(int duree, QString optionMenu);
     void afficherTextePermanent(QString texte);
+    void afficherSortieMenu(int duree);
 private:
     char _modeFinJeu; // pousavoir si score ou temps
 

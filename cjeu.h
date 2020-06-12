@@ -60,7 +60,6 @@ private slots:
 
 public slots:
     void on_toucheRecue(int touche);
-    void on_sigMenuPupitre(int menu);
 };
 
 #endif // CJEU_H
