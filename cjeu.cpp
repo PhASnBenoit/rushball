@@ -336,6 +336,11 @@ void CJeu::on_toucheRecue(int touche)
     emit sig_toucheRecue(touche); // vers CGererPupitre
 }
 
+void CJeu::on_reqAffScores()
+{
+    emit sig_majScores(_zdc->getAQuiLeTour());
+}
+
 void CJeu::on_erreur(QString mess)
 {
     emit sig_erreur(mess);  // remontée des erreurs à l'IHM

@@ -60,6 +60,7 @@ private slots:
 
 public slots:
     void on_toucheRecue(int touche);
+    void on_reqAffScores();
 };
 
 #endif // CJEU_H

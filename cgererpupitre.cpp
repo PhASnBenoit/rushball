@@ -15,8 +15,7 @@ CGererPupitre::~CGererPupitre()
 void CGererPupitre::on_toucheRecue(int touche)
 {
     // filtre touches autorisées
-    switch (touche)
-    {
+    switch (touche) {
     case Qt::Key_Slash:
     case Qt::Key_0:
     case Qt::Key_1:
@@ -68,34 +67,45 @@ void CGererPupitre::traiterSaisie(int touche)
         _touches[_ind] = 0;
         break;
 
-    case ETAT_PUPITRE_MENU_AFFICHER_SCORES:
+    case ETAT_PUPITRE_VALIDE_AFFICHER_SCORES:
         if (touche == Qt::Key_Return) {
             emit sig_reqAffScores(); // requête d'affichage des scores
             _etatPupitre = ETAT_PUPITRE_SCORES_ATTENTE_RETOUR;
-        }
+        } // if entree
+        _ind = 0;
+        _touches[_ind] = 0;
         break;
     case ETAT_PUPITRE_SCORES_ATTENTE_RETOUR:
-        break;
-    case ETAT_PUPITRE_MENU_PENALITE:
+        if (touche == Qt::Key_Return) {
+            _etatPupitre = ETAT_PUPITRE_CHOIX_MENU;
+            _aff->afficherMenu();
+        } // if entree
+        _ind = 0;
+        _touches[_ind] = 0;
         break;
 
-    case ETAT_PUPITRE_MENU_AQUILETOUR:
-        break;
-    case ETAT_PUPITRE_MENU_CORRIGER:
-        break;
-    case ETAT_PUPITRE_AFFICHER_SCORES:
+    case ETAT_PUPITRE_MENU_PENALITE:
+
+        _ind = 0;
+        _touches[_ind] = 0;
         break;
     case ETAT_PUPITRE_PENALITE_NO_JOUEUR:
         break;
     case ETAT_PUPITRE_PENALITE_ATTENTE_RETOUR:
         break;
+
+    case ETAT_PUPITRE_MENU_AQUILETOUR:
+        break;
     case ETAT_PUPITRE_AQUILETOUR_NO_JOUEUR:
         break;
     case ETAT_PUPITRE_AQUILETOUR_ATTENTE_RETOUR:
         break;
+
+    case ETAT_PUPITRE_MENU_CORRIGER:
+        break;
     case ETAT_PUPITRE_CORRIGER_NO_JOUEUR:
         break;
-    case ETAT_PUPITRE_CORRIGER_SAISIE_RETOUR:
+    case ETAT_PUPITRE_CORRIGER_SAISIE:
         break;
     case ETAT_PUPITRE_CORRIGER_ATTENTE_RETOUR:
         break;

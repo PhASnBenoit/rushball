@@ -24,6 +24,7 @@ private:
 signals:
     void sig_stop();
     void sig_start();
+    void sig_reqAffScores();
 
 public slots:
 
