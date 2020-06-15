@@ -11,7 +11,8 @@ CServeurTcp::~CServeurTcp()
 {
     // suppression de toutes les connexions avec les clients
     for (int i=0 ; i<_clients.size() ; i++) {
-        delete (_clients.at(i));
+        if (_clients.at(i)->isConnected())
+            delete (_clients.at(i));
     } // for
     _clients.clear();
 }

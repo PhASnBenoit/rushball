@@ -101,8 +101,8 @@ void CJeu::play()
     connect(this, &CJeu::sig_toucheRecue, _pup, &CGererPupitre::on_toucheRecue);
     connect(_pup, &CGererPupitre::sig_stop, this, &CJeu::on_stop);
     connect(_pup, &CGererPupitre::sig_start, this, &CJeu::on_start);
-    connect(_pup, &CGererPupitre::sig_afficherScores, this, &CJeu::on_sigMenuPupitre);
-
+    connect(_pup, &CGererPupitre::sig_info, this, &CJeu::on_info);
+    connect(_pup, &CGererPupitre::sig_reqAffScores, this, &CJeu::on_reqAffScores);
 
     emit sig_info("CJeu::play : comm avec les cibles en cours.");
 }
@@ -253,6 +253,8 @@ void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
             break;
         } // sw
 
+        // A FAIRE Envoyer la trame de suivi
+
         // A FAIRE tester fin de partie
         if (isFinDePartie())
             emit sig_finDePartie();
@@ -268,7 +270,7 @@ void CJeu::on_newConnection()
 
 void CJeu::on_disconnected()
 {
-    emit sig_info("CJeu::on_disconnected : Un client vien de se déconnecter");
+    emit sig_info("CJeu::on_disconnected : Un client vient de se déconnecter");
 }
 
 void CJeu::on_play()
@@ -300,6 +302,7 @@ void CJeu::on_stop()
     _tmr->stop();
     _zdc->setEtatJeu(ETAT_JEU_EN_PAUSE);
     _aff->afficherMenu(); // afficher le menu
+    emit sig_info("Jeu stoppé par le pupitre. Menu actif.");
 }
 
 void CJeu::on_start()
@@ -307,6 +310,7 @@ void CJeu::on_start()
     // méthode le jeu reprend après une correction
     _tmr->start();
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
+    emit sig_info("Sortie du menu, le jeu continue.");
 }
 
 void CJeu::on_timeout()
@@ -333,7 +337,9 @@ void CJeu::on_finDePartie()
 
 void CJeu::on_toucheRecue(int touche)
 {
-    emit sig_toucheRecue(touche); // vers CGererPupitre
+    if ( (_zdc->etatJeu()==ETAT_JEU_EN_COURS) || (_zdc->etatJeu() == ETAT_JEU_EN_PAUSE))
+        emit sig_toucheRecue(touche); // vers CGererPupitre
+    // sinon on ne fait rien.
 }
 
 void CJeu::on_reqAffScores()

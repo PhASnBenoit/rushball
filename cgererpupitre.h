@@ -25,6 +25,7 @@ signals:
     void sig_stop();
     void sig_start();
     void sig_reqAffScores();
+    void sig_info(QString mess);
 
 public slots:
 

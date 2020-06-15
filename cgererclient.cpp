@@ -54,7 +54,7 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
     QByteArray rep;
 
     rep = _prot->repondreAConnexion('0');  // par défaut pas possible
-    if ( !(_etatClient|ETAT_CLIENT_CONNECTED)) {  // si client pas encore connecté
+    if (_etatClient|ETAT_CLIENT_CONNECTED) {  // si client pas encore connecté
         emit sig_info("CGererClient::on_connexionAsked : Connexion demandée");
         // vérification du login + mdp
         if (_bdd->verifierParamsConnexion(login, mdp)) { // si bon login mdp

@@ -5,8 +5,8 @@
 //#include <cserveurtcp.h>
 #include "czdc.h"
 
-#define LG_TRAME_PARAMS 117 // moins les :
-#define LG_TRAME_CONNEXION 36
+#define LG_TRAME_PARAMS 115 // moins les :
+#define LG_TRAME_CONNEXION 34
 #define LG_TRAME_ANNULATION_PARTIE 6
 
 class CProtocleClient : public QObject

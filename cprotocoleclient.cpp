@@ -104,8 +104,8 @@ int CProtocleClient::decodeEtControleParams()
 
     params.clear();
     params = groupes.at(3).split(';');
-    _ds->modeJeu = params.at(0)[0]-0x30;  // mode de jeu
-    _ds->modeFinJeu = params.at(1)[0]-0x30;  // mode fin de jeu
+    _ds->modeJeu = params.at(0)[0];  // mode de jeu
+    _ds->modeFinJeu = params.at(1)[0];  // mode fin de jeu
     _ds->cpt = static_cast<uint16_t>(params.at(2).toUInt());  // score ou temps de départ
 
     _ds->nbPointsFaute = static_cast<uint8_t>(groupes.at(4).toUInt());  // nb points pour faute
@@ -124,9 +124,8 @@ int CProtocleClient::decodeEtControleParams()
 
     params.clear();
     params = groupes.at(8).split(';');
-    for (int i=0 ; i<_ds->nbCouleurs ; i+=2)   // point pour chaque couleur utilisée
-        _ds->nbPointsParCouleur[params.at(i).toInt()] = static_cast<uint8_t>(params.at(i+1).toUInt());
-
+    for (int i=0 ; i<_ds->nbCouleurs ; i++)   // point pour chaque couleur utilisée
+        _ds->nbPointsParCouleur[params.at(2*i).toInt()] = static_cast<uint8_t>(params.at(2*i+1).toUInt());
 
     return 0; // RAS
 }
