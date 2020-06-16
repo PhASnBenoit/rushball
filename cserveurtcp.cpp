@@ -30,6 +30,7 @@ void CServeurTcp::on_newConnection()
     connect(this, &CServeurTcp::sig_majScores, gererClient, &CGererClient::on_majScores);
     connect(gererClient, &CGererClient::sig_erreur, this, &CServeurTcp::on_erreur);
     connect(gererClient, &CGererClient::sig_play, this, &CServeurTcp::on_play);
+    connect(gererClient, &CGererClient::sig_trameConnexionValidated, this, &CServeurTcp::on_trameConnexionValidated);
     connect(client, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error),
         [=](QAbstractSocket::SocketError socketError) {
         this->on_error(socketError);});
@@ -85,8 +86,12 @@ void CServeurTcp::on_annulationPartie()
     emit sig_annulationPartie();  // relais pour cjeu
 }
 
+void CServeurTcp::on_trameConnexionValidated()
+{
+    emit sig_trameConnexionValidated(); // relais vers CJeu
+}
+
 void CServeurTcp::on_majScores(uint8_t aQuiLeTour)
 {
-    // A FAIRE pour chaque client connecté, envoyer trame de mise à jour des scores
     emit sig_majScores(aQuiLeTour);
 }

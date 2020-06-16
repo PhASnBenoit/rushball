@@ -41,6 +41,7 @@ signals:
     void sig_info(QString mess);
     void sig_play();
     void sig_annulationPartie();
+    void sig_trameConnexionValidated();
 };
 
 #endif // CGERERCLIENT_H

@@ -56,6 +56,7 @@ private slots:
     void on_start();
     void on_timeout();  // timer d'affichage
     void on_finDePartie();
+    void on_trameConnexionValidated();
 
 public slots:
     void on_toucheRecue(int touche);

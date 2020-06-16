@@ -25,6 +25,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_serv, &CServeurTcp::sig_erreur, this, &CJeu::on_erreur);
     connect(_serv, &CServeurTcp::sig_info, this, &CJeu::on_info);
     connect(_serv, &CServeurTcp::sig_disconnected, this, &CJeu::on_disconnected);
+    connect(_serv, &CServeurTcp::sig_trameConnexionValidated, this, &CJeu::on_trameConnexionValidated);
     connect(_serv, &CServeurTcp::sig_play, this, &CJeu::on_play);
     connect(this, &CJeu::sig_finDePartie, this, &CJeu::on_finDePartie);
 
@@ -333,6 +334,11 @@ void CJeu::on_finDePartie()
     _tmr->stop();
     _zdc->setEtatJeu(ETAT_JEU_ATTENTE_PARAMS);
     // réinitialisation de tout
+}
+
+void CJeu::on_trameConnexionValidated()
+{
+    _zdc->setEtatJeu(ETAT_JEU_ATTENTE_PARAMS);
 }
 
 void CJeu::on_toucheRecue(int touche)

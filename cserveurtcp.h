@@ -28,6 +28,7 @@ private slots:
     void on_erreur(QString mess);  // relais vers CJeu
     void on_info(QString mess);  // relais vers CJeu
     void on_annulationPartie();  // relais vers CJeu
+    void on_trameConnexionValidated();
 
 public slots:
     void on_majScores(uint8_t aQuiLeTour);
@@ -40,6 +41,7 @@ signals:
     void sig_info(QString mess);
     void sig_annulationPartie();  //  relais pour CJeu
     void sig_majScores(uint8_t aQuiLeTour);  // relais pour chaque CGererClient
+    void sig_trameConnexionValidated();
 };
 
 #endif // CSERVEURTCP_H
