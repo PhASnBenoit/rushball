@@ -84,7 +84,7 @@ void CJeu::play()
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
     // INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
     genererCouleursDesCibles();
-/*
+
     // init thread de communication avec les cibles
     _pans = new CCommPanneaux();
     _thPans = new QThread();
@@ -96,7 +96,7 @@ void CJeu::play()
     connect(_pans, &CCommPanneaux::sig_info, this, &CJeu::on_info);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
-*/
+
     // Gestion du pupitre de correction des erreurs
     _pup = new CGererPupitre();
     connect(this, &CJeu::sig_toucheRecue, _pup, &CGererPupitre::on_toucheRecue);
