@@ -22,6 +22,7 @@ signals:
     void sig_finCycleCommPanneaux();
     void sig_cibleTouchee(uint8_t noPan, uint8_t cibles);
     void sig_replay();
+    void sig_info(QString mess);
 
 public slots:
     void on_playCommCibles();

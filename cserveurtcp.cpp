@@ -25,6 +25,7 @@ void CServeurTcp::on_newConnection()
     emit sig_newConnection(); // pour debug et affichage
     client = nextPendingConnection(); // récupération de la socket client
     gererClient = new CGererClient(client);
+    connect(client, &QTcpSocket::disconnected, client, &QTcpSocket::deleteLater);
     connect(gererClient, &CGererClient::sig_info, this, &CServeurTcp::on_info);
     connect(this, &CServeurTcp::sig_majScores, gererClient, &CGererClient::on_majScores);
     connect(gererClient, &CGererClient::sig_erreur, this, &CServeurTcp::on_erreur);
@@ -42,14 +43,15 @@ void CServeurTcp::on_disconnected()
     qDebug() << "CCommClient::on_disconnected";
     // purge des CGererClient déconnecté
     for (int i=0 ; i<_clients.size() ; i++) {
-        if (!_clients.at(i)->isConnected()) {
-            delete _clients.at(i);
+        if (_clients.at(i)->isConnected() == QAbstractSocket::UnconnectedState) {
+//            delete _clients.at(i); // effacé par deleteLater()
             _clients.removeAt(i);
             emit sig_info("CServeurTcp::on_disconnected : Effacement d'un client");
             i=0;
             continue;  // recommence la boucle avec i=0
         } // if connected
     } // for
+    emit sig_info("CServeurTcp::on_disconnected Nb Clients restant : "+QString::number(_clients.size()));
     emit sig_disconnected();
 }
 

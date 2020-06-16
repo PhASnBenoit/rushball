@@ -12,6 +12,7 @@ CIhm::CIhm(QWidget *parent) :
     connect(_jeu, &CJeu::sig_erreur, this, &CIhm::on_erreurJeu);
     connect(_jeu, &CJeu::sig_info, this, &CIhm::on_info);
     connect(this, &CIhm::sig_toucheRecue, _jeu, &CJeu::on_toucheRecue);
+    connect(this, &CIhm::sig_cibleTouched, _jeu, &CJeu::on_cibleTouchee);  // pour simulation vers CJeu
 }
 
 CIhm::~CIhm()
@@ -47,7 +48,7 @@ void CIhm::on_pupitre(QString mess)
     ui->tePupitre->append(mess);
 }
 
-void CIhm::on_pbTest_clicked()
+void CIhm::on_pbCibleTouched_clicked()
 {
-  _jeu->play();
+    emit sig_cibleTouched(static_cast<uint8_t>(ui->sbPan->value()),static_cast<uint8_t>(ui->sbCibles->value()));
 }

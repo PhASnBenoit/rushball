@@ -27,12 +27,13 @@ private:
 
 signals:
     void sig_toucheRecue(int touche); // vers CJeu
+    void sig_cibleTouched(uint8_t noPan, uint8_t cibles);
 
 private slots:
     void on_erreurJeu(QString mess);
     void on_info(QString mess);
     void on_pupitre(QString mess);
-    void on_pbTest_clicked();
+    void on_pbCibleTouched_clicked();
 };
 
 #endif // CIHM_H

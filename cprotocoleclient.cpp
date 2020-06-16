@@ -27,15 +27,25 @@ QByteArray CProtocleClient::preparerTrameMajScores(uint8_t nbJoueurs, QList<QStr
     _tc.append(':');
     _tc.append('S');
     _tc.append('|');
+    _tc.append(static_cast<char>(aQuiLeTour+0x30));
+    _tc.append(';');
     for (int i=0 ; i<nbJoueurs ; i++) {
         _tc.append(13-nomJoueurs.at(i).trimmed().size(), ' '); // met les espaces en premier 13 car maxi
         _tc.append(nomJoueurs.at(i));
-        _tc.append(':');
+        _tc.append(';');
         _tc.append(QString::number(scores.at(i)));
+        _tc.append(';');
     } // for
+
+    // A calculer c'est une simulation
+    _tc.append('1');  // à calculer
+    _tc.append('0');  // à calculer
+    _tc.append('0');  // à calculer
+    _tc.append(';');
+    _tc.append('1');  // à calculer simulation partie en cours
     _tc.append('|');
-    _tc.append('x');  // à calculer
-    _tc.append('x');  // à calculer
+    _tc.append('X'); // CRC16 PF calculé après
+    _tc.append('X'); // CRC16 pf calculé après
     _tc.append(':'); // fin de trame
     crc = calculerCrc16();
     _tc[_tc.size()-3] = static_cast<char>(crc>>8);  // mise en place du CRC16 PF

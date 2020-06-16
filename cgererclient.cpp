@@ -3,8 +3,6 @@
 CGererClient::CGererClient(QTcpSocket *sock)
 {
     _sock = sock;
-//    if (!setSocketDescriptor(_desc))
-//        emit sig_erreur("CGererClient::CGererClient : Erreur de socket.");
     connect(_sock, &QTcpSocket::readyRead, this, &CGererClient::on_readyRead);
 
     _prot = new CProtocleClient();
@@ -21,8 +19,10 @@ CGererClient::CGererClient(QTcpSocket *sock)
 
 CGererClient::~CGererClient()
 {
-    _sock->close();
-    delete _sock;
+    if (_sock->isOpen()) {
+        _sock->close();
+        delete _sock;
+    } // if open
     delete _zdc;
     delete _bdd;
     delete _prot;
@@ -84,19 +84,19 @@ void CGererClient::on_connexionAsked(QString login, QString mdp, QString origine
 
 void CGererClient::on_newParamsReady(T_DATAS_STATIC *ds)
 {
+    // Paramètres bien reçus
     QByteArray rep;
 
     // réponse au client
-    if ( (_zdc->etatJeu()==ETAT_JEU_ATTENTE_PARAMS)) {
+//    if ( (_zdc->etatJeu()==ETAT_JEU_ATTENTE_PARAMS)) {
         _zdc->appliquerNewParams(ds);
         _etatClient |= ETAT_CLIENT_PARAMETRED;
-        _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
-        rep = _prot->repondreAConnexion('1'); // accepté
+//        rep = _prot->repondreAConnexion('1'); // accepté
         emit sig_play();  // lance le jeu relayé par CServeurTcp
-    } else {
-        rep = _prot->repondreAConnexion('0'); // Pas possible
-    } // else
-    envoyerAuClient(rep);
+//    } else {
+//        rep = _prot->repondreAConnexion('0'); // Pas possible
+//    } // else
+//    envoyerAuClient(rep);
 } // méthode
 
 void CGererClient::on_annulationPartieAsked()

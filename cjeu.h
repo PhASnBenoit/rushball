@@ -45,7 +45,6 @@ signals:
     void sig_toucheRecue(int touche);
 
 private slots:
-    void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
     void on_newConnection();
     void on_disconnected();
     void on_erreur(QString mess);
@@ -61,6 +60,7 @@ private slots:
 public slots:
     void on_toucheRecue(int touche);
     void on_reqAffScores();
+    void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
 };
 
 #endif // CJEU_H

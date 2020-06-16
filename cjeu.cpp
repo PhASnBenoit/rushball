@@ -60,9 +60,8 @@ CJeu::~CJeu()
 void CJeu::play()
 {
     // méthode appelée lorsque le paramétrage est correct.
-
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
-    emit sig_info("CJeu::play : Le jeu commence...");
+    emit sig_info("CJeu::play : ETAT_JEU_EN_COURS");
 
     _zdc->setDureePoints(_zdc->getCpt());  // fixe le temps ou nb de points restant
     _zdc->joueurSuivant();  // Premier joueur puisque le jeu démarre
@@ -84,7 +83,7 @@ void CJeu::play()
     emit sig_info("CJeu::play : Lancement thread de comm avec les cibles.");
     // INIT DES COULEURS DES CIBLES SUIVANT LA REGLE
     genererCouleursDesCibles();
-
+/*
     // init thread de communication avec les cibles
     _pans = new CCommPanneaux();
     _thPans = new QThread();
@@ -93,9 +92,10 @@ void CJeu::play()
     connect(this, &CJeu::sig_playCommCibles, _pans, &CCommPanneaux::on_playCommCibles);
     connect(_pans, &CCommPanneaux::sig_cibleTouchee, this, &CJeu::on_cibleTouchee);
     connect(_pans, &CCommPanneaux::sig_finCycleCommPanneaux, this, &CJeu::on_finCycleCommPanneau);
+    connect(_pans, &CCommPanneaux::sig_info, this, &CJeu::on_info);
     _thPans->start();  // lancement du thread
     emit sig_playCommCibles();  // lance la communication I2C
-
+*/
     // Gestion du pupitre de correction des erreurs
     _pup = new CGererPupitre();
     connect(this, &CJeu::sig_toucheRecue, _pup, &CGererPupitre::on_toucheRecue);
@@ -253,13 +253,13 @@ void CJeu::on_cibleTouchee(uint8_t noPan, uint8_t cibles)
             break;
         } // sw
 
-        // A FAIRE Envoyer la trame de suivi
+        bool fin = isFinDePartie();
 
-        // A FAIRE tester fin de partie
-        if (isFinDePartie())
+        if (fin)
             emit sig_finDePartie();
+
         _zdc->joueurSuivant();
-        emit sig_majScores(_zdc->getAQuiLeTour());
+        emit sig_majScores(_zdc->getAQuiLeTour()); // envoi le signal vers CCserveurTcp et CCommAffichage
     } // if etat
 }
 
@@ -302,7 +302,7 @@ void CJeu::on_stop()
     _tmr->stop();
     _zdc->setEtatJeu(ETAT_JEU_EN_PAUSE);
     _aff->afficherMenu(); // afficher le menu
-    emit sig_info("Jeu stoppé par le pupitre. Menu actif.");
+    emit sig_info("CJeu::on_stop : JETAT_JEU_EN_PAUSE");
 }
 
 void CJeu::on_start()
@@ -310,7 +310,7 @@ void CJeu::on_start()
     // méthode le jeu reprend après une correction
     _tmr->start();
     _zdc->setEtatJeu(ETAT_JEU_EN_COURS);
-    emit sig_info("Sortie du menu, le jeu continue.");
+    emit sig_info("CJeu::on_start : ETAT_JEU_EN_COURS");
 }
 
 void CJeu::on_timeout()

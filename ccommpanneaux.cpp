@@ -43,8 +43,10 @@ void CCommPanneaux::on_playCommCibles()
 
     emit sig_finCycleCommPanneaux(); // pour l'instant sert pas à grand chose
 
-    if (!_pause)  // on relance sauf si pause demandée
+    if (!_pause) { // on relance sauf si pause demandée
+        emit sig_info("Relance de l'interrogation des panneaux.");
         emit sig_replay();
+    } // if pause
 }
 
 void CCommPanneaux::stop()
