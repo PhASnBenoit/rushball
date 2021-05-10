@@ -91,7 +91,7 @@ void CJeu ::play()
 
     _aff->afficherBienvenue(2);
     _aff->afficherTypeJeu(2);
-    _aff->on_affScores(_zdc->getAQuiLeTour());
+    _aff->affScores(_zdc->getAQuiLeTour(), _zdc->getScores());
     _tmr->start(); //lance affichage des scores
 
     _zdc->setDureePoints(_zdc->getCpt());
