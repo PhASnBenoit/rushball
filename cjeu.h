@@ -7,15 +7,12 @@
 #include <QString>
 #include <QTimer>
 
+#include "czdc.h"
+#include "cserveurtcp.h"
 #include "ccommpanneaux.h"
 #include "ccommaffichage.h"
-#include "czdc.h"
 #include "cgererpupitre.h"
-#include "cserveurtcp.h"
-
-typedef struct {
-    int scores[4];
-} T_SCORES;
+#include "communs.h"
 
 class CJeu : public QObject
 {
@@ -45,23 +42,40 @@ signals:
     void sig_toucheRecue(int touche);
 
 private slots:
-    void on_newConnection();
-    void on_disconnected();
-    void on_erreur(QString mess);
+
     void on_info(QString mess);
+    void on_erreur(QString mess);
     void on_play();
-    void on_finCycleCommPanneau();
-    void on_stop();
-    void on_start();
     void on_timeout();  // timer d'affichage
     void on_finDePartie();
+
+    // slot de CIhm
+    void on_toucheRecue(int touche);
+
+    // slots ce CServeurTcp
+    void on_newConnection();
+    void on_disconnected();
     void on_trameConnexionValidated();
     void on_annulationPartie();
 
-public slots:
-    void on_toucheRecue(int touche);
-    void on_reqAffScores();
+    // slots de CCgererPupitre
+    void on_stop();
+    void on_start();
+    void on_affScores();
+    void on_affQuelJoueur();
+    void on_affValScore(int val);
+    void on_affJoueurChoisi(int noJ);
+    void on_affMenu();
+    void on_affDureeTexte(uint8_t duree, QString texte);
+    void on_appliquerPenalite(int noJ);
+    void on_appliquerChangeJoueur(int noJ);
+    void on_appliquerChangeScore(int noJ, int val);
+
+    // slots de CCommPanneau
     void on_cibleTouchee(uint8_t noPan, uint8_t cibles);
+    void on_finCycleCommPanneau();
+
+public slots:
 };
 
 #endif // CJEU_H

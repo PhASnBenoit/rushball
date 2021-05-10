@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtSerialPort>
+#include "communs.h"
 
 #define ID "00"  // tous les afficheurs
 
@@ -14,9 +15,12 @@ public:
     ~CCommAffichage();
     void afficherBienvenue(uint duree);
     void afficherTypeJeu(uint duree);
-    void afficherQuelJoueur();
-    void afficherTextePermanent(QString texte);
-    void afficherPlusMoins();
+    void affScores(uint8_t aQuiLeTour, QList<uint16_t> scores);
+    void affQuelJoueur();
+    void affValScore(int val);
+    void affJoueurChoisi(int noJ);
+    void affMenu();
+    void affDureeTexte(uint8_t duree, QString texte);
 
 private:
     char _modeFinJeu; // pour savoir si score ou temps
@@ -29,10 +33,6 @@ private:
    void afficher(char *prot, char *mess);
 
 public slots:
-    void on_afficherScores(uint8_t aQuiLeTour);
-    void on_afficherMenu();
-    void on_afficherSortieMenu(uint duree);
-    void on_afficherMenuSelected(uint duree, QString texte);
 };
 
 #endif // CCOMMAFFICHAGE_H

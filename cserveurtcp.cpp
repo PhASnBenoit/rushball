@@ -4,7 +4,7 @@ CServeurTcp::CServeurTcp()
 {
     connect(this, &CServeurTcp::newConnection, this, &CServeurTcp::on_newConnection);
     connect(this, &CServeurTcp::acceptError, this, &CServeurTcp::on_acceptError);
-    listen(QHostAddress::Any, PORT);
+    listen(QHostAddress::Any, NOPORT);
 }
 
 CServeurTcp::~CServeurTcp()

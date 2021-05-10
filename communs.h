@@ -15,7 +15,7 @@
 // params panneaux
 #define ADR_BASE_PAN 0x31   // adresse de base du premier panneau
 // PORT SERVEUR
-#define PORT 4444  // A METTRE DANS CONFIG.INI
+#define NOPORT 4444  // A METTRE DANS CONFIG.INI
 // JEU
 #define ETAT_JEU_ATTENTE_CONNEXION 1
 #define ETAT_JEU_ATTENTE_PARAMS 2
@@ -27,6 +27,11 @@
 #define ETAT_CLIENT_PARAMETRED 4 // client ayant paramétré
 #define ETAT_CLIENT_PREMIER 8  // premier client connecté
 
+// pour faciliter la sauvegarde en QList
+typedef struct {
+    int scores[4];
+} T_SCORES;
+
 // PUPITRE
 typedef enum etats_pupitre {
     ETAT_PUP_HORS_MENU,
@@ -35,9 +40,20 @@ typedef enum etats_pupitre {
     ETAT_PUP_MENU_PENALITE,
     ETAT_PUP_MENU_AQUI,
     ETAT_PUP_MENU_CORRIGER,
-    ETAT_PUP_PENALITE_QUI,
     ETAT_PUP_CORRIGER_QUI
 } T_ETATS_PUPITRE;
+
+typedef enum{
+    ETEINT,
+    ROUGE,
+    VERT,
+    BLEU,
+    MAGENTA,
+    CYAN,
+    BLANC,
+    JAUNE,
+    JOKER=JAUNE
+} T_COULEURS;
 
 #define TOUCHE_STOP "/"
 

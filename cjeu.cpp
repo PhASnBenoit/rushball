@@ -9,13 +9,19 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
 
     _aff = new CCommAffichage();
     _pup = new CGererPupitre();
-    connect(_pup, &CGererPupitre::sig_afficherMenu, _aff, &CCommAffichage::on_afficherMenu);
-    connect(_pup, &CGererPupitre::sig_afficherSortieMenu, _aff, &CCommAffichage::on_afficherSortieMenu);
-    connect(_pup, &CGererPupitre::sig_afficherMenuSelected, _aff, &CCommAffichage::on_afficherMenuSelected);
+    connect(_pup, &CGererPupitre::sig_affScores, this, &CJeu::on_affScores);
+    connect(_pup, &CGererPupitre::sig_affQuelJoueur, this, &CJeu::on_affQuelJoueur);
+    connect(_pup, &CGererPupitre::sig_affValScore, this, &CJeu::on_affValScore);
+    connect(_pup, &CGererPupitre::sig_affJoueurChoisi, this, &CJeu::on_affJoueurChoisi);
+    connect(_pup, &CGererPupitre::sig_affMenu, this, &CJeu::on_affMenu);
+    connect(_pup, &CGererPupitre::sig_affDureeTexte, this, &CJeu::on_affDureeTexte);
+    connect(_pup, &CGererPupitre::sig_appliquerPenalite, this, &CJeu::on_appliquerPenalite);
+    connect(_pup, &CGererPupitre::sig_appliquerChangeJoueur, this, &CJeu::on_appliquerChangeJoueur);
+    connect(_pup, &CGererPupitre::sig_appliquerChangeScore, this, &CJeu::on_appliquerChangeScore);
     connect(_pup, &CGererPupitre::sig_stop, this, &CJeu::on_stop);
     connect(_pup, &CGererPupitre::sig_start, this, &CJeu::on_start);
     connect(_pup, &CGererPupitre::sig_info, this, &CJeu::on_info);
-    connect(_pup, &CGererPupitre::sig_reqAffScores, this, &CJeu::on_reqAffScores);
+    connect(_pup, &CGererPupitre::sig_erreur, this, &CJeu::on_erreur);
     connect(this, &CJeu::sig_toucheRecue, _pup, &CGererPupitre::on_toucheRecue);
 
     _tmr = new QTimer();
@@ -23,7 +29,7 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     //connect(_tmr, &QTimer::timeout, this, &CJeu::on_timeout);
 
     // pour le moment, qu'un seul client autorisé à se connecter.
-    // EVOLUTION 2021 : Plusieurs clients se connectent
+    // EVOLUTION : Plusieurs clients se connectent
     // ne permet qu'au premier client de lancer un paramétrage.
     // les autres clients qui se connecte n'auront qu'un suivi du jeu.
     _serv = new CServeurTcp();  // mise en route du serveur TCP
@@ -35,7 +41,6 @@ CJeu::CJeu(QObject *parent) : QObject(parent)
     connect(_serv, &CServeurTcp::sig_trameConnexionValidated, this, &CJeu::on_trameConnexionValidated);
     connect(_serv, &CServeurTcp::sig_play, this, &CJeu::on_play);
     connect(this, &CJeu::sig_finDePartie, this, &CJeu::on_finDePartie);
-    connect(this, &CJeu::sig_majScores, _aff, &CCommAffichage::on_afficherScores);
     connect(this, &CJeu::sig_majScores, _serv, &CServeurTcp::on_majScores);
 
     emit sig_info("CJeu:CJeu : Services ZDC, Serveur TCP activés.");
@@ -86,7 +91,7 @@ void CJeu ::play()
 
     _aff->afficherBienvenue(2);
     _aff->afficherTypeJeu(2);
-    _aff->on_afficherScores(_zdc->getAQuiLeTour());
+    _aff->on_affScores(_zdc->getAQuiLeTour());
     _tmr->start(); //lance affichage des scores
 
     _zdc->setDureePoints(_zdc->getCpt());
@@ -340,9 +345,53 @@ void CJeu::on_toucheRecue(int touche)
     // sinon on ne fait rien.
 }
 
-void CJeu::on_reqAffScores()
+void CJeu::on_affScores()
 {
-    emit sig_majScores(_zdc->getAQuiLeTour());
+    QList<uint16_t> scores;
+    scores = _zdc->getScores();
+    _aff->affScores(_zdc->getAQuiLeTour(), scores);
+}
+
+void CJeu::on_affQuelJoueur()
+{
+    _aff->affQuelJoueur();
+}
+
+void CJeu::on_affValScore(int val)
+{
+    _aff->affValScore(val);
+}
+
+void CJeu::on_affJoueurChoisi(int noJ)
+{
+    _aff->affJoueurChoisi(noJ);
+}
+
+void CJeu::on_affMenu()
+{
+    _aff->affMenu();
+}
+
+void CJeu::on_affDureeTexte(uint8_t duree, QString texte)
+{
+    _aff->affDureeTexte(duree, texte);
+}
+
+void CJeu::on_appliquerPenalite(int noJ)
+{
+    // A FAIRE
+}
+
+void CJeu::on_appliquerChangeJoueur(int noJ)
+{
+    // A FAIRE
+
+}
+
+void CJeu::on_appliquerChangeScore(int noJ, int val)
+{
+    // A FAIRE
+
 }
 
 void CJeu::on_erreur(QString mess)

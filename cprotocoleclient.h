@@ -2,7 +2,6 @@
 #define CPROTOCOLECLIENT_H
 
 #include <QObject>
-//#include <cserveurtcp.h>
 #include "czdc.h"
 
 #define LG_TRAME_PARAMS 115 // moins les :

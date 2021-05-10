@@ -13,7 +13,7 @@
 
 #define DEBUG_PANNEAU
 
-#define PORT            "/dev/ttyUSB0"
+#define COMPORT            "/dev/ttyUSB0"
 
 #define LG_MAX_TRAME    500
 #define LG_MAX          150
@@ -29,7 +29,7 @@
 CCommAffichage::CCommAffichage(char modeFinJeu, QObject *parent) : QObject(parent)
 {
     _modeFinJeu = modeFinJeu;
-    _sp.setPortName("/dev/ttyUB0");
+    _sp.setPortName(COMPORT);
     if (_sp.open(QSerialPort::WriteOnly))
         qDebug()<<"Port ouvert !";
     else
@@ -81,7 +81,7 @@ void CCommAffichage::afficherTypeJeu(uint duree)
     sleep(duree);
 }
 
-void CCommAffichage::on_afficherMenu()
+void CCommAffichage::affMenu()
 {
     char protocole[LG_MAX_TRAME];
     char message[LG_MAX];
@@ -91,17 +91,7 @@ void CCommAffichage::on_afficherMenu()
     afficher(protocole, message);
 }
 
-void CCommAffichage::afficherPlusMoins()
-{
-    char protocole[LG_MAX_TRAME];
-    char message[LG_MAX];
-
-    sprintf(protocole, "<L1><PA><FE><MA><WB><FG><CB><AC><CA>");
-    sprintf(message, " - ou + pour naviguer dans les scores"); // attention : longueur max du message égale à LG_MAX-1
-    afficher(protocole, message);
-}
-
-void CCommAffichage::on_afficherMenuSelected(uint duree, QString texte)
+void CCommAffichage::affDureeTexte(uint8_t duree, QString texte)
 {
     char protocole[LG_MAX_TRAME];
     char message[LG_MAX];
@@ -110,11 +100,11 @@ void CCommAffichage::on_afficherMenuSelected(uint duree, QString texte)
     sprintf(message, "%s", texte.toStdString().c_str());
     afficher(protocole, message);
 
-   if (duree >0)
+   if (duree > 0)
        sleep(duree);
 }
 
-void CCommAffichage::afficherQuelJoueur()
+void CCommAffichage::affQuelJoueur()
 {
     char protocole[LG_MAX_TRAME];
     char message[LG_MAX];
@@ -124,57 +114,59 @@ void CCommAffichage::afficherQuelJoueur()
     afficher(protocole, message);
 }
 
-void CCommAffichage::afficherTextePermanent(QString texte)
-{
-    char protocole[LG_MAX_TRAME];
-    char message[LG_MAX];
 
-    sprintf(protocole,"<L1><PA><FE><MQ><WD><FG><CB><AC><CS>");
-    sprintf(message,"%s",texte.toStdString().c_str());
-    afficher(protocole, message);
-}
-
-void CCommAffichage::on_afficherSortieMenu(uint duree)
-{
-    char protocole[LG_MAX_TRAME];
-    char message[LG_MAX];
-
-    sprintf(protocole,"<L1><PA><FE><MQ><WD><FG><CB><AC><CS>");
-    sprintf(message,"Sortie menu");
-    afficher(protocole, message);
-    usleep(duree);
-}
-
-void CCommAffichage::on_afficherScores(uint8_t aQuiLeTour)
+void CCommAffichage::affScores(uint8_t aQuiLeTour, QList<uint16_t> scores)
 {
     char protocole[LG_MAX_TRAME];
     char message[LG_MAX];
 
     // PREVOIR DE METTRE EN EVIDENCE A QUI LE TOUR
+    // METTRE LES VRAIS SCORES
     sprintf(protocole,"<L1><PA><FE><MQ><WD><FG><CB><AC>P1=0<CD>P2=8<CH>P3=2<CS>");
     sprintf(message,"P4=5");
     afficher(protocole, message);
 }
 
+void CCommAffichage::affValScore(int val)
+{
+    char protocole[LG_MAX_TRAME];
+    char message[LG_MAX];
 
-    unsigned char CCommAffichage::calculerChecksum(char *trame)
-    {
-       unsigned char checksum = 0;
-       uint i = 0;
+    // A FAIRE Afficher la valeur
+    sprintf(protocole,"<L1><PA><FE><MQ><WD><FG><CB><AC><CS>");
+    sprintf(message,"A FAIRE");
+    afficher(protocole, message);
+}
 
-       #ifdef DEBUG_PANNEAU
-       printf("data packet :\t");
-       for(i=0 ; i<strlen(trame) ; i++)
-          printf("0x%02X ", trame[i]);
-       printf("\n");
-       #endif
+void CCommAffichage::affJoueurChoisi(int noJ)
+{
+    char protocole[LG_MAX_TRAME];
+    char message[LG_MAX];
 
-       for(i=0 ; i<strlen(trame) ; i++)
-          checksum ^= trame[i];
+    // A FAIRE Afficher le joueur choisi
+    sprintf(protocole,"<L1><PA><FE><MQ><WD><FG><CB><AC><CS>");
+    sprintf(message,"A FAIRE");
+    afficher(protocole, message);
+}
 
-       #ifdef DEBUG_PANNEAU
-       printf("checksum :\t0x%02X\n", checksum);
-       #endif
+unsigned char CCommAffichage::calculerChecksum(char *trame)
+{
+   unsigned char checksum = 0;
+   uint i = 0;
 
-       return checksum;
-    }
+   #ifdef DEBUG_PANNEAU
+   printf("data packet :\t");
+   for(i=0 ; i<strlen(trame) ; i++)
+      printf("0x%02X ", trame[i]);
+   printf("\n");
+   #endif
+
+   for(i=0 ; i<strlen(trame) ; i++)
+      checksum ^= trame[i];
+
+   #ifdef DEBUG_PANNEAU
+   printf("checksum :\t0x%02X\n", checksum);
+   #endif
+
+   return checksum;
+}

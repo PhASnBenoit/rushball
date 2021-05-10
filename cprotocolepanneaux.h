@@ -2,6 +2,7 @@
 #define CPROTOCOLEPANNEAUX_H
 
 #include <QObject>
+#include "communs.h"
 
 #define CRC_INIT 0xFF
 #define CRC_POLY 0x31

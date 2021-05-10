@@ -41,7 +41,7 @@ void CGererClient::on_readyRead()
     QByteArray tc;  // trame reçu du client
     tc = _sock->readAll();
     //emit sig_trameClient(tc);
-    char commande = _prot->on_trameClient(tc);  // vérification et décodage de la trame
+    int commande = _prot->on_trameClient(tc);  // vérification et décodage de la trame
     // commande = X,P,C, -1 si mal passé, 0 si trame non complète
     // _prot->on_trameClient envoie un signal correspondant à la trame reçue
     if (commande == -1) // si erreur dans trame
